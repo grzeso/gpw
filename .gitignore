@@ -14,3 +14,7 @@
 /.php_cs
 /.php_cs.cache
 ###< friendsofphp/php-cs-fixer ###
+
+/composer.json
+/composer.lock
+/symfony.lock
