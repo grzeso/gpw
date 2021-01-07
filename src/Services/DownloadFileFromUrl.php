@@ -13,16 +13,16 @@ class DownloadFileFromUrl
         $this->client = $client;
     }
 
-    public function downloadFile(string $url): string
+    public function downloadFile(string $url)
     {
         $response = $this->client->request(
             'GET',
             $url
         );
 
-//        $statusCode = $response->getStatusCode();
-//        $contentType = $response->getHeaders()['content-type'][0];
+        $tmpfname = tempnam(sys_get_temp_dir(), 'tmpxls');
+        file_put_contents($tmpfname, $response->getContent());
 
-        return $response->getContent();
+        return $tmpfname;
     }
 }
