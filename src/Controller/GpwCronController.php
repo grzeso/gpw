@@ -22,6 +22,12 @@ class GpwCronController extends AbstractController
         $currentDate = date('d-m-Y');
 //        $currentDate = '19-02-2021';
         $userId = 1;
+        $excludedDays = [6, 0];
+
+        //ref - oddzielna klasa która to sprawdza + mozliwość wykluczenia konkretnych dat
+        if (in_array(date('w'), $excludedDays)) {
+            die('SOBOTA LUB NIEDZIELA');
+        }
 
         $filename = $download->downloadFile('https://www.gpw.pl/archiwum-notowan?fetch=1&type=10&instrument=&date='.$currentDate);
         $spreadsheet = $excel->load($filename);
