@@ -5,6 +5,7 @@ namespace App\Services;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class DownloadFileFromUrl
+//zmienić na FIle
 {
     private $client;
 
@@ -19,6 +20,8 @@ class DownloadFileFromUrl
             'GET',
             $url
         );
+
+        //TODO extension
 
         $tmpfname = tempnam(sys_get_temp_dir(), 'tmpxls');
         file_put_contents($tmpfname, $response->getContent());

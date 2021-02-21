@@ -7,10 +7,8 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class ReadDataFromExcel
 {
-    public function readDataFromFile(string $fileName): Spreadsheet
+    public function load(string $fileName): Spreadsheet
     {
-        $reader = new Xls();
-
-        return $reader->load($fileName);
+        return (new Xls())->load($fileName);
     }
 }
