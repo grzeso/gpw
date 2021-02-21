@@ -38,15 +38,11 @@ class CreateExcel
 
         $data = $this->excel->getActiveSheet();
 
-        dump($this->excel);
-
         $allValue = 0;
 
         foreach ($this->userStocks as $userStock) {
             foreach ($this->value as $value) {
                 if ($value->getName() === $userStock->getName()) {
-                    echo $value->getName();
-
                     $allValue += $userStock->getQuantity() * $value->getValue();
 
                     $data
@@ -59,7 +55,17 @@ class CreateExcel
             }
         }
 
-        $data->setCellValue('H5', 'WARTOSC:')->setCellValue('I5', $allValue);
+        $data->setCellValue('H8', 'WARTOSC:')->setCellValue('I8', $allValue);
+    }
+
+    public function addSpecialFields($userId)
+    {
+        $specialFields = (new SpecialFields\SpecialFieldsFactory())->factory($userId);
+        $data = $this->excel->getActiveSheet();
+
+        foreach ($specialFields as $position => $value) {
+            $data->setCellValue($position, $value);
+        }
     }
 
     public function makeFile()
@@ -67,13 +73,9 @@ class CreateExcel
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->excel);
 
         $writer->save('dane.xlsx');
-
-//        header('Content-Type: application/vnd.ms-excel');
-//header('Content-Disposition: attachment; filename="file.xls"');
-//$writer->save("php://output");
     }
 
-    public function makeAttachement()
+    public function makeAttachement(): string
     {
         ob_start();
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->excel);
@@ -82,10 +84,5 @@ class CreateExcel
         ob_end_clean();
 
         return $attachment;
-//        $writer->save('dane.xlsx');
-
-//        header('Content-Type: application/vnd.ms-excel');
-//header('Content-Disposition: attachment; filename="file.xls"');
-//$writer->save("php://output");
     }
 }

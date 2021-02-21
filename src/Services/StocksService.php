@@ -18,8 +18,8 @@ class StocksServices
 
         for ($row = 1; $row <= $highestRow; ++$row) {
             if (in_array($activeSheet->getCell('B'.$row)->getValue(), $userStocksName)) {
-                echo 'JEST  '.$activeSheet->getCell('B'.$row)
-                 ->getValue().' KURS ZAMKNIECIA '.$activeSheet->getCell('H'.$row)->getValue();
+//                echo 'JEST  '.$activeSheet->getCell('B'.$row)
+//                 ->getValue().' KURS ZAMKNIECIA '.$activeSheet->getCell('H'.$row)->getValue();
 
                 $stock = new Stock();
                 $stock->setName($activeSheet->getCell('B'.$row)->getValue());

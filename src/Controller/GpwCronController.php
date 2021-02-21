@@ -19,12 +19,11 @@ class GpwCronController extends AbstractController
      */
     public function execute(DownloadFileFromUrl $download, ReadDataFromExcel $excel, GpwSpreadsheet $worksheet, \Swift_Mailer $mailer)
     {
-//        $currentDate = date('d-m-Y');
-        $currentDate = '18-02-2021';
-        $userId = 3;
+        $currentDate = date('d-m-Y');
+//        $currentDate = '19-02-2021';
+        $userId = 1;
 
         $filename = $download->downloadFile('https://www.gpw.pl/archiwum-notowan?fetch=1&type=10&instrument=&date='.$currentDate);
-
         $spreadsheet = $excel->load($filename);
 
         $worksheet->load($spreadsheet);
@@ -36,12 +35,11 @@ class GpwCronController extends AbstractController
 
         $value = StocksServices::findUserStockValue($activeSheet, $userStocksName);
 
-        dump($userStocks);
-
         $outputExcel = new CreateExcel();
         $outputExcel->setUserStocks($userStocks);
         $outputExcel->setValue($value);
         $outputExcel->create();
+        $outputExcel->addSpecialFields($userId);
 
         $name = 'GPW_'.$currentDate;
         $attachment = new Swift_Attachment($outputExcel->makeAttachement(), $name, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
