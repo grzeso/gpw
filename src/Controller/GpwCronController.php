@@ -11,6 +11,7 @@ use App\Services\StocksServices;
 use App\Services\CreateExcel;
 use Swift_Attachment;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Exception;
 
 class GpwCronController extends AbstractController
 {
@@ -20,40 +21,51 @@ class GpwCronController extends AbstractController
     public function execute(DownloadFileFromUrl $download, ReadDataFromExcel $excel, GpwSpreadsheet $worksheet, \Swift_Mailer $mailer)
     {
         $currentDate = date('d-m-Y');
-//        $currentDate = '19-02-2021';
+//        $currentDate = '20-02-2021';
         $userId = 1;
         $excludedDays = [6, 0];
+        $name = 'GPW_'.$currentDate;
 
-        //ref - oddzielna klasa która to sprawdza + mozliwość wykluczenia konkretnych dat
+        //TODO REF - oddzielna klasa która to sprawdza + mozliwość wykluczenia konkretnych dat
         if (in_array(date('w'), $excludedDays)) {
             die('SOBOTA LUB NIEDZIELA');
         }
 
-        $filename = $download->downloadFile('https://www.gpw.pl/archiwum-notowan?fetch=1&type=10&instrument=&date='.$currentDate);
-        $spreadsheet = $excel->load($filename);
+        $message = new \Swift_Message();
+        $message->setFrom('gpw@grzegorzzdunczyk.pl');
 
-        $worksheet->load($spreadsheet);
-        $activeSheet = $worksheet->getActiveSheet();
+        try {
+            $filename = $download->downloadFile('https://www.gpw.pl/archiwum-notowan?fetch=1&type=10&instrument=&date='.$currentDate);
+            $spreadsheet = $excel->load($filename);
 
-        $userStocks = $this->getDoctrine()->getRepository(Stocks::class)->getUserStocks($userId);
+            $worksheet->load($spreadsheet);
+            $activeSheet = $worksheet->getActiveSheet();
 
-        $userStocksName = StocksServices::getStocksName($userStocks);
+            $userStocks = $this->getDoctrine()->getRepository(Stocks::class)->getUserStocks($userId);
 
-        $value = StocksServices::findUserStockValue($activeSheet, $userStocksName);
+            $userStocksName = StocksServices::getStocksName($userStocks);
 
-        $outputExcel = new CreateExcel();
-        $outputExcel->setUserStocks($userStocks);
-        $outputExcel->setValue($value);
-        $outputExcel->create();
-        $outputExcel->addSpecialFields($userId);
+            $value = StocksServices::findUserStockValue($activeSheet, $userStocksName);
 
-        $name = 'GPW_'.$currentDate;
-        $attachment = new Swift_Attachment($outputExcel->makeAttachement(), $name, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            $outputExcel = new CreateExcel();
+            $outputExcel->setUserStocks($userStocks);
+            $outputExcel->setValue($value);
+            $outputExcel->create();
+            $outputExcel->addSpecialFields($userId);
 
-        $message = (new \Swift_Message($name))
-                ->setFrom('gpw@grzegorzzdunczyk.pl')
-                ->setTo('grzeso@interia.pl')
-                ->attach($attachment);
+            $attachment = new Swift_Attachment($outputExcel->makeAttachement(), $name, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+            $message
+                   ->attach($attachment);
+        } catch (PhpOffice\PhpSpreadsheet\Exception $e) {
+            $name = $e->getMessage();
+        } catch (Exception $e) {
+            $name = $e->getMessage();
+        }
+        $message
+                    ->setTo('grzeso@interia.pl')
+                    ->setSubject($name)
+                    ->setBody($name);
 
         $mailer->send($message);
 
