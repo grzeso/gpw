@@ -32,7 +32,7 @@ class GpwCronController extends AbstractController
         }
 
         $message = new \Swift_Message();
-        $message->setFrom('gpw@grzegorzzdunczyk.pl');
+        $message->setFrom($this->getParameter('gpw_email'));
 
         try {
             $filename = $download->downloadFile('https://www.gpw.pl/archiwum-notowan?fetch=1&type=10&instrument=&date='.$currentDate);
