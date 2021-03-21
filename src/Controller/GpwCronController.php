@@ -6,6 +6,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Services\DownloadFileFromUrl;
 use App\Services\ReadDataFromExcel;
 use App\Entity\Stocks;
+use App\Services\DaysWithoutSessionServices;
 use App\Services\GpwSpreadsheet;
 use App\Services\StocksServices;
 use App\Services\CreateExcel;
@@ -13,22 +14,22 @@ use Swift_Attachment;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Exception;
 
+
 class GpwCronController extends AbstractController
 {
     /**
      * @Route("/cron/gpw", name="gpw_cron")
      */
-    public function execute(DownloadFileFromUrl $download, ReadDataFromExcel $excel, GpwSpreadsheet $worksheet, \Swift_Mailer $mailer)
+    public function execute(DownloadFileFromUrl $download, ReadDataFromExcel $excel, GpwSpreadsheet $worksheet, \Swift_Mailer $mailer, \App\Helper\DaysWithoutSessionHelper $dwss)
     {
         $currentDate = date('d-m-Y');
 //        $currentDate = '20-02-2021';
         $userId = 1;
-        $excludedDays = [6, 0];
+
         $name = 'GPW_'.$currentDate;
 
-        //TODO REF - oddzielna klasa która to sprawdza + mozliwość wykluczenia konkretnych dat
-        if (in_array(date('w'), $excludedDays)) {
-            die('SOBOTA LUB NIEDZIELA');
+        if ($dwss::isDayWithoutSession()) {
+            die('Dzień bez sesji');
         }
 
         $message = new \Swift_Message();
