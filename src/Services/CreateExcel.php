@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 
 class CreateExcel
 {

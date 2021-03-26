@@ -2,41 +2,41 @@
 
 namespace App\Controller;
 
-use Symfony\Component\Routing\Annotation\Route;
-use App\Services\DownloadFileFromUrl;
-use App\Services\ReadDataFromExcel;
 use App\Entity\Stocks;
-use App\Services\DaysWithoutSessionServices;
-use App\Services\GpwSpreadsheet;
-use App\Services\StocksServices;
 use App\Services\CreateExcel;
+use App\Services\DownloadFileFromUrl;
+use App\Services\GpwSpreadsheet;
+use App\Services\ReadDataFromExcel;
+use App\Services\StocksServices;
+use Exception;
 use Swift_Attachment;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Exception;
-
+use Symfony\Component\Routing\Annotation\Route;
 
 class GpwCronController extends AbstractController
 {
     /**
-     * @Route("/cron/gpw", name="gpw_cron")
+     * @Route("/cron/gpw/{date?}", name="gpw_cron")
      */
-    public function execute(DownloadFileFromUrl $download, ReadDataFromExcel $excel, GpwSpreadsheet $worksheet, \Swift_Mailer $mailer, \App\Helper\DaysWithoutSessionHelper $dwss)
+    public function execute($date, DownloadFileFromUrl $download, ReadDataFromExcel $excel, GpwSpreadsheet $worksheet, \Swift_Mailer $mailer, \App\Helper\DaysWithoutSessionHelper $dwss)
     {
-        $currentDate = date('d-m-Y');
-//        $currentDate = '20-02-2021';
+        if (!$date) {
+            $date = date('d-m-Y');
+        }
+
         $userId = 1;
 
-        $name = 'GPW_'.$currentDate;
+        $name = 'GPW_'.$date;
 
         if ($dwss::isDayWithoutSession()) {
-            die('Dzień bez sesji');
+            exit('Dzień bez sesji');
         }
 
         $message = new \Swift_Message();
         $message->setFrom($this->getParameter('gpw_email'));
 
         try {
-            $filename = $download->downloadFile('https://www.gpw.pl/archiwum-notowan?fetch=1&type=10&instrument=&date='.$currentDate);
+            $filename = $download->downloadFile('https://www.gpw.pl/archiwum-notowan?fetch=1&type=10&instrument=&date='.$date);
             $spreadsheet = $excel->load($filename);
 
             $worksheet->load($spreadsheet);
