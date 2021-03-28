@@ -7,27 +7,23 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 class CreateExcel
 {
     private $excel;
-    private $userStocks;
-    private $value;
+    private $stocks;
+    private $gpwExcel;
+    private $userId;
 
-    public function getUserStocks()
+    public function setUserId($userId)
     {
-        return $this->userStocks;
+        $this->userId = $userId;
     }
 
-    public function getValue()
+    public function setStocks($stocks)
     {
-        return $this->value;
+        $this->stocks = $stocks;
     }
 
-    public function setUserStocks($userStocks)
+    public function setGpwExcel($gpwExcel)
     {
-        $this->userStocks = $userStocks;
-    }
-
-    public function setValue($value)
-    {
-        $this->value = $value;
+        $this->gpwExcel = $gpwExcel;
     }
 
     public function create()
@@ -39,8 +35,10 @@ class CreateExcel
 
         $allValue = 0;
 
-        foreach ($this->userStocks as $userStock) {
-            foreach ($this->value as $value) {
+        $this->stocks->findUserStocks();
+
+        foreach ($this->stocks->getUserStocks() as $userStock) {
+            foreach ($this->gpwExcel->findStockValue() as $value) {
                 if ($value->getName() === $userStock->getName()) {
                     $allValue += $userStock->getQuantity() * $value->getValue();
 
@@ -57,9 +55,9 @@ class CreateExcel
         $data->setCellValue('H8', 'WARTOSC:')->setCellValue('I8', $allValue);
     }
 
-    public function addSpecialFields($userId)
+    public function addSpecialFields()
     {
-        $specialFields = (new SpecialFields\SpecialFieldsFactory())->factory($userId);
+        $specialFields = (new SpecialFields\SpecialFieldsFactory())->factory($this->userId);
         $data = $this->excel->getActiveSheet();
 
         foreach ($specialFields as $position => $value) {

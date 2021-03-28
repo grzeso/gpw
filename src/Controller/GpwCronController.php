@@ -2,16 +2,16 @@
 
 namespace App\Controller;
 
-use App\Entity\Stocks;
 use App\Helper\DaysWithoutSessionHelper;
 use App\Helper\UserHelper;
 use App\Services\CreateExcel;
 use App\Services\DownloadFileFromUrl;
-use App\Services\GpwSpreadsheet;
-use App\Services\ReadDataFromExcel;
-use App\Services\StocksServices;
+use App\Services\Excel;
+use App\Services\GpwExcel;
+use App\Services\StocksService;
 use Exception;
 use Swift_Attachment;
+use Swift_Mailer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -23,11 +23,12 @@ class GpwCronController extends AbstractController
     public function execute(
             $date,
             DownloadFileFromUrl $download,
-            ReadDataFromExcel $excel,
-            GpwSpreadsheet $worksheet,
-            Sift_Mailer $mailer,
+            Swift_Mailer $mailer,
             DaysWithoutSessionHelper $dwss,
-            UserHelper $userHelper
+            UserHelper $userHelper,
+            Excel $excel,
+            StocksService $stocks,
+            GpwExcel $gpwExcel
             ) {
         if (!$date) {
             $date = date('d-m-Y');
@@ -45,26 +46,20 @@ class GpwCronController extends AbstractController
         $message->setFrom($this->getParameter('gpw_email'));
 
         try {
-            // ref - dać to do jednej klasy
             $filename = $download->downloadFile('https://www.gpw.pl/archiwum-notowan?fetch=1&type=10&instrument=&date='.$date);
-            $spreadsheet = $excel->load($filename);
 
-            $worksheet->load($spreadsheet);
-            $activeSheet = $worksheet->getActiveSheet();
+            $excel->loadFile($filename);
+            $stocks->setUserId($userId);
 
-            $userStocks = $this->getDoctrine()->getRepository(Stocks::class)->getUserStocks($userId);
-
-            $userStocksName = StocksServices::getStocksName($userStocks);
-
-            $value = StocksServices::findUserStockValue($activeSheet, $userStocksName);
-
-            //ref end
+            $gpwExcel->setExcel($excel);
+            $gpwExcel->setStocks($stocks);
 
             $outputExcel = new CreateExcel();
-            $outputExcel->setUserStocks($userStocks);
-            $outputExcel->setValue($value);
+            $outputExcel->setUserId($userId);
+            $outputExcel->setStocks($stocks);
+            $outputExcel->setGpwExcel($gpwExcel);
             $outputExcel->create();
-            $outputExcel->addSpecialFields($userId);
+            $outputExcel->addSpecialFields();
 
             $attachment = new Swift_Attachment($outputExcel->makeAttachement(), $name, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 

@@ -2,33 +2,42 @@
 
 namespace App\Services;
 
-use App\Entity\Stock;
+use App\Entity\Stocks;
+use Doctrine\ORM\EntityManagerInterface;
 
-class StocksServices
+class StocksService
 {
-    public static function getStocksName(array $userStocks): array
+    /**
+     * @var EntityManager
+     */
+    private $entityManager;
+    private $userStocks;
+    private $userId;
+
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        return array_map(function ($stock) { return $stock->getName(); }, $userStocks);
+        $this->entityManager = $entityManager;
     }
 
-    public static function findUserStockValue($activeSheet, $userStocksName): array
+    public function setUserId(int $userId): void
     {
-        $userStocks = [];
-        $highestRow = $activeSheet->getHighestRow();
+        $this->userId = $userId;
+    }
 
-        for ($row = 1; $row <= $highestRow; ++$row) {
-            if (in_array($activeSheet->getCell('B'.$row)->getValue(), $userStocksName)) {
-//                echo 'JEST  '.$activeSheet->getCell('B'.$row)
-//                 ->getValue().' KURS ZAMKNIECIA '.$activeSheet->getCell('H'.$row)->getValue();
+    public function findUserStocks()
+    {
+        $this->userStocks = $this->entityManager->getRepository(Stocks::class)->getUserStocks($this->userId);
+    }
 
-                $stock = new Stock();
-                $stock->setName($activeSheet->getCell('B'.$row)->getValue());
-                $stock->setValue($activeSheet->getCell('H'.$row)->getValue());
-                $stock->setChange($activeSheet->getCell('I'.$row)->getValue());
-                array_push($userStocks, $stock);
-            }
-        }
+    public function getUserStocks()
+    {
+        return $this->userStocks;
+    }
 
-        return $userStocks;
+    public function getUserStocksName(): array
+    {
+        $this->findUserStocks();
+
+        return array_map(function ($stock) { return $stock->getName(); }, $this->userStocks);
     }
 }
