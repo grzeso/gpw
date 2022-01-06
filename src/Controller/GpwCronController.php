@@ -21,7 +21,7 @@ class GpwCronController extends AbstractController
      * @Route("/cron/gpw/{date?}", name="gpw_cron")
      */
     public function execute(
-            $date,
+            string $date,
             DownloadFileFromUrl $download,
             Swift_Mailer $mailer,
             DaysWithoutSessionHelper $dwss,
@@ -55,6 +55,7 @@ class GpwCronController extends AbstractController
             $gpwExcel->setStocks($stocks);
 
             $outputExcel = new CreateExcel();
+            $outputExcel->setDate($date);
             $outputExcel->setUserId($userId);
             $outputExcel->setStocks($stocks);
             $outputExcel->setGpwExcel($gpwExcel);

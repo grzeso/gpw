@@ -3,6 +3,7 @@
 namespace App\Helper;
 
 use App\Entity\User;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 
 class UserHelper
@@ -22,10 +23,11 @@ class UserHelper
         $user = self::$entityManager->getRepository(User::class)->findOneBy(['id' => $userId]);
         $mailCollection = $user->getUsersEmails();
 
+        $mails = [];
+
         foreach ($mailCollection as $mailEntity) {
             $mails[] = $mailEntity->getEmail();
         }
-
         return $mails;
     }
 }

@@ -2,15 +2,24 @@
 
 namespace App\Services\SpecialFields;
 
+use App\Services\SpecialFields\Users\Grzesiek;
+
 class SpecialFieldsFactory
 {
-    public function factory(int $userId): array
+    private array $classes = [
+        Grzesiek::class,
+    ];
+
+    public function factory(int $userId): ?UserInterface
     {
-        $class = 'App\Services\SpecialFields\User'.$userId;
-        if (class_exists($class)) {
-            return (new $class())->specialFields();
+        /* @var UserInterface $class */
+        foreach ($this->classes as $class) {
+            $instance = new $class();
+            if ($instance->check($userId)) {
+                return new $instance();
+            }
         }
 
-        return [];
+        return null;
     }
 }

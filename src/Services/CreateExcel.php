@@ -10,6 +10,7 @@ class CreateExcel
     private $stocks;
     private $gpwExcel;
     private $userId;
+    private string $date;
 
     public function setUserId($userId)
     {
@@ -57,7 +58,9 @@ class CreateExcel
 
     public function addSpecialFields()
     {
-        $specialFields = (new SpecialFields\SpecialFieldsFactory())->factory($this->userId);
+        $class = (new SpecialFields\SpecialFieldsFactory())->factory($this->userId);
+        $class->setDate($this->getDate());
+        $specialFields = $class->specialFields();
         $data = $this->excel->getActiveSheet();
 
         foreach ($specialFields as $position => $value) {
@@ -81,5 +84,15 @@ class CreateExcel
         ob_end_clean();
 
         return $attachment;
+    }
+
+    public function getDate(): string
+    {
+        return $this->date;
+    }
+
+    public function setDate(string $date): void
+    {
+        $this->date = $date;
     }
 }
