@@ -21,7 +21,7 @@ class GpwCronController extends AbstractController
      * @Route("/cron/gpw/{date?}", name="gpw_cron")
      */
     public function execute(
-            string $date,
+            ?string $date,
             DownloadFileFromUrl $download,
             Swift_Mailer $mailer,
             DaysWithoutSessionHelper $dwss,
