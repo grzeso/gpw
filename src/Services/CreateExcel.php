@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Services\SpecialFields\SpecialFieldsFactory;
+use App\Services\SpecialFields\UserInterface;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class CreateExcel
@@ -58,9 +60,10 @@ class CreateExcel
 
     public function addSpecialFields()
     {
-        $class = (new SpecialFields\SpecialFieldsFactory())->factory($this->userId);
+        /** @var UserInterface $class */
+        $class = (new SpecialFieldsFactory())->factory($this->userId);
         $class->setDate($this->getDate());
-        $specialFields = $class->specialFields();
+        $specialFields = $class->getSpecialFields();
         $data = $this->excel->getActiveSheet();
 
         foreach ($specialFields as $position => $value) {

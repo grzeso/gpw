@@ -18,7 +18,7 @@ class Grzesiek implements UserInterface
         return false;
     }
 
-    public function specialFields(): array
+    public function getSpecialFields(): array
     {
         return [
             'A2' => 'aktualny kurs',
