@@ -2,8 +2,7 @@
 
 namespace App\Services;
 
-use App\Services\SpecialFields\SpecialFieldsFactory;
-use App\Services\SpecialFields\UserInterface;
+use App\Services\SpecialFields\Dto\SpecialFieldsDto;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class CreateExcel
@@ -11,13 +10,8 @@ class CreateExcel
     private $excel;
     private $stocks;
     private $gpwExcel;
-    private $userId;
-    private string $date;
 
-    public function setUserId($userId)
-    {
-        $this->userId = $userId;
-    }
+    private string $date;
 
     public function setStocks($stocks)
     {
@@ -58,19 +52,6 @@ class CreateExcel
         $data->setCellValue('H8', 'WARTOSC:')->setCellValue('I8', $allValue);
     }
 
-    public function addSpecialFields()
-    {
-        /** @var UserInterface $class */
-        $class = (new SpecialFieldsFactory())->factory($this->userId);
-        $class->setDate($this->getDate());
-        $specialFields = $class->getSpecialFields();
-        $data = $this->excel->getActiveSheet();
-
-        foreach ($specialFields as $position => $value) {
-            $data->setCellValue($position, $value);
-        }
-    }
-
     public function makeFile()
     {
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->excel);
@@ -89,13 +70,12 @@ class CreateExcel
         return $attachment;
     }
 
-    public function getDate(): string
+    public function setSpecialFields(SpecialFieldsDto $specialFieldsDto)
     {
-        return $this->date;
-    }
+        $data = $this->excel->getActiveSheet();
 
-    public function setDate(string $date): void
-    {
-        $this->date = $date;
+        foreach ($specialFieldsDto->get() as $position => $value) {
+            $data->setCellValue($position, $value);
+        }
     }
 }

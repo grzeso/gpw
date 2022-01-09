@@ -4,10 +4,12 @@ namespace App\Controller;
 
 use App\Helper\DaysWithoutSessionHelper;
 use App\Helper\UserHelper;
+use App\Helper\Users\UsersFactory;
 use App\Services\CreateExcel;
 use App\Services\DownloadFileFromUrl;
 use App\Services\Excel;
 use App\Services\GpwExcel;
+use App\Services\SpecialFields\Dto\SpecialFieldsDto;
 use App\Services\StocksService;
 use Exception;
 use Swift_Attachment;
@@ -38,6 +40,10 @@ class GpwCronController extends AbstractController
             }
         }
 
+        $specialData = [
+            'date' => date('Y-m-d', strtotime($date)),
+        ];
+
         $userId = 1;
 
         $name = 'GPW_'.$date;
@@ -46,21 +52,19 @@ class GpwCronController extends AbstractController
         $message->setFrom($this->getParameter('gpw_email'));
 
         try {
-            $filename = $download->downloadFile('https://www.gpw.pl/archiwum-notowan?fetch=1&type=10&instrument=&date='.$date);
-
-            $excel->loadFile($filename);
-            $stocks->setUserId($userId);
+            $user = (new UsersFactory())->factory($userId);
+            $excel->loadFile($download->fasade($date));
+            $stocks->setUser($user);
 
             $gpwExcel->setExcel($excel);
             $gpwExcel->setStocks($stocks);
 
             $outputExcel = new CreateExcel();
-            $outputExcel->setDate($date);
-            $outputExcel->setUserId($userId);
             $outputExcel->setStocks($stocks);
             $outputExcel->setGpwExcel($gpwExcel);
             $outputExcel->create();
-            $outputExcel->addSpecialFields();
+            $specialFieldsDto = (new SpecialFieldsDto($user, $specialData));
+            $outputExcel->setSpecialFields($specialFieldsDto);
 
             $attachment = new Swift_Attachment($outputExcel->makeAttachement(), $name, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 

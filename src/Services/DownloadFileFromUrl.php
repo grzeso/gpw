@@ -8,24 +8,44 @@ class DownloadFileFromUrl
 //zmienić na FIle
 {
     private $client;
+    private $date;
+    private $fileName;
+
+    private $url = 'https://www.gpw.pl/archiwum-notowan?fetch=1&type=10&instrument=&date=';
 
     public function __construct(HttpClientInterface $client)
     {
         $this->client = $client;
     }
 
-    public function downloadFile(string $url)
+    public function setDate(string $date)
+    {
+        $this->date = $date;
+    }
+
+    public function getFileName(): string
+    {
+        return $this->fileName;
+    }
+
+    public function downloadFile(): void
     {
         $response = $this->client->request(
             'GET',
-            $url
+            $this->url.$this->date
         );
 
         //TODO extension
 
-        $tmpfname = tempnam(sys_get_temp_dir(), 'tmpxls');
-        file_put_contents($tmpfname, $response->getContent());
+        $this->fileName = tempnam(sys_get_temp_dir(), 'tmpxls');
+        file_put_contents($this->fileName, $response->getContent());
+    }
 
-        return $tmpfname;
+    public function fasade(string $date): string
+    {
+        $this->setDate($date);
+        $this->downloadFile();
+
+        return $this->getFileName();
     }
 }
