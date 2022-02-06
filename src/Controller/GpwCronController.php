@@ -2,13 +2,17 @@
 
 namespace App\Controller;
 
+use App\Entity\Settings;
+use App\Entity\User;
 use App\Helper\DaysWithoutSessionHelper;
+use App\Helper\SettingsHelper;
 use App\Helper\UserHelper;
 use App\Helper\Users\UsersFactory;
 use App\Services\CreateExcel;
 use App\Services\DownloadFileFromUrl;
 use App\Services\Excel;
 use App\Services\GpwExcel;
+use App\Services\Logger\Logger;
 use App\Services\SpecialFields\Dto\SpecialFieldsDto;
 use App\Services\StocksService;
 use Exception;
@@ -20,22 +24,38 @@ use Symfony\Component\Routing\Annotation\Route;
 class GpwCronController extends AbstractController
 {
     /**
-     * @Route("/cron/gpw/{date?}", name="gpw_cron")
+     * @Route("/cron/gpw/{userId?}/{date?}", name="gpw_cron")
      */
     public function execute(
             ?string $date,
+            ?int $userId,
             DownloadFileFromUrl $download,
             Swift_Mailer $mailer,
             DaysWithoutSessionHelper $dwss,
             UserHelper $userHelper,
             Excel $excel,
             StocksService $stocks,
-            GpwExcel $gpwExcel
+            GpwExcel $gpwExcel,
+            Logger $logger,
+            SettingsHelper $settingsHelper
             ) {
+        if (!$userId) {
+            $userId = 4;
+        }
+        /** @var User $usingUser */
+        $usingUser = $this->getDoctrine()->getRepository(User::class)->find((int) $userId);
+        /** @var Settings $logNumber */
+        $logNumber = $this->getDoctrine()->getRepository(Settings::class)->findOneBy(['name' => 'log_number']);
+        $settingsHelper->updateLogNumber($logNumber);
+
+        $logger->log('start crona', $usingUser, Logger::EVENT_START, (int) $logNumber->getValue(), ['userId' => $userId, 'date' => $date ?? '']);
+
         if (!$date) {
             $date = date('d-m-Y');
 
             if ($dwss::isDayWithoutSession()) {
+                $logger->log('Dzien bez sesji', $usingUser, Logger::EVENT_START, (int) $logNumber->getValue(), ['userId' => $userId, 'date' => $date ?? '']);
+
                 exit('Dzień bez sesji');
             }
         }
