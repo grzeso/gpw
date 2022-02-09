@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Settings;
 use App\Entity\User;
-use App\Helper\DaysWithoutSessionHelper;
+use App\Helper\AccessHelper;
 use App\Helper\SettingsHelper;
 use App\Helper\UserHelper;
 use App\Helper\Users\UsersFactory;
@@ -16,22 +16,25 @@ use App\Services\Logger\Logger;
 use App\Services\SpecialFields\Dto\SpecialFieldsDto;
 use App\Services\StocksService;
 use Exception;
+use PhpOffice\PhpSpreadsheet\Exception as SpreadsheetException;
 use Swift_Attachment;
 use Swift_Mailer;
+use Swift_Message;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
 class GpwCronController extends AbstractController
 {
     /**
-     * @Route("/cron/gpw/{userId?}/{date?}", name="gpw_cron")
+     * @Route("/cron/gpw/{userId?}/{date?}/{allowed?}", name="gpw_cron")
      */
     public function execute(
             ?string $date,
             ?int $userId,
+            ?int $allowed,
             DownloadFileFromUrl $download,
             Swift_Mailer $mailer,
-            DaysWithoutSessionHelper $dwss,
+            AccessHelper $accessHelper,
             UserHelper $userHelper,
             Excel $excel,
             StocksService $stocks,
@@ -40,7 +43,7 @@ class GpwCronController extends AbstractController
             SettingsHelper $settingsHelper
             ) {
         if (!$userId) {
-            $userId = 4;
+            $userId = User::USER_CRON;
         }
         /** @var User $usingUser */
         $usingUser = $this->getDoctrine()->getRepository(User::class)->find((int) $userId);
@@ -48,15 +51,20 @@ class GpwCronController extends AbstractController
         $logNumber = $this->getDoctrine()->getRepository(Settings::class)->findOneBy(['name' => 'log_number']);
         $settingsHelper->updateLogNumber($logNumber);
 
-        $logger->log('start crona', $usingUser, Logger::EVENT_START, (int) $logNumber->getValue(), ['userId' => $userId, 'date' => $date ?? '']);
-
+        $originalDate = $date;
         if (!$date) {
             $date = date('d-m-Y');
+        }
 
-            if ($dwss::isDayWithoutSession()) {
-                $logger->log('Dzien bez sesji', $usingUser, Logger::EVENT_START, (int) $logNumber->getValue(), ['userId' => $userId, 'date' => $date ?? '']);
+        $logger->log(Logger::EVENT_START_MESSAGE, $usingUser, Logger::EVENT_START, (int) $logNumber->getValue(), $date, ['userId' => $userId, 'date' => $originalDate ?? '']);
 
-                exit('Dzień bez sesji');
+        try {
+            $accessHelper->isAccess($date, $allowed);
+        } catch (Exception $e) {
+            $logger->log($e->getMessage(), $usingUser, $e->getCode(), (int) $logNumber->getValue(), $date, ['userId' => $userId, 'date' => $originalDate ?? '']);
+
+            if (Logger::EVENT_ACCESS_NOT_ALLOWED === $e->getCode()) {
+                exit($e->getMessage());
             }
         }
 
@@ -68,7 +76,7 @@ class GpwCronController extends AbstractController
 
         $name = 'GPW_'.$date;
 
-        $message = new \Swift_Message();
+        $message = new Swift_Message();
         $message->setFrom($this->getParameter('gpw_email'));
 
         try {
@@ -90,15 +98,13 @@ class GpwCronController extends AbstractController
 
             $message
                    ->attach($attachment);
-        } catch (PhpOffice\PhpSpreadsheet\Exception $e) {
-            $name = $e->getMessage();
-        } catch (Exception $e) {
+        } catch (SpreadsheetException | Exception $e) {
             $name = $e->getMessage();
         }
         $message
-                    ->setTo($userHelper::getUserMails($userId))
-                    ->setSubject($name)
-                    ->setBody($name);
+            ->setTo($userHelper::getUserMails($userId))
+            ->setSubject($name)
+            ->setBody($name);
 
         $mailer->send($message);
 

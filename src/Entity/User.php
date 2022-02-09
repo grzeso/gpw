@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class User
 {
+    public const USER_CRON = 4;
     /**
      * @ORM\Id
      * @ORM\GeneratedValue

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Log;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -47,4 +48,18 @@ class LogRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function findByTsAndEventId(DateTime $date, int $eventId)
+    {
+        return $this->createQueryBuilder('l')
+            ->andWhere('l.ts >= :dateStart')
+            ->andWhere('l.ts <= :dateEnd')
+            ->andWhere('l.eventId = :eventId')
+            ->setParameter('dateStart', $date->setTime(0, 0, 0))
+            ->setParameter('dateEnd', $date->setTime(23, 59, 59))
+            ->setParameter('eventId', $eventId)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 }
