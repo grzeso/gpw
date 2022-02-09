@@ -26,11 +26,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class GpwCronController extends AbstractController
 {
     /**
-     * @Route("/cron/gpw/{userId?}/{date?}/{allowed?}", name="gpw_cron")
+     * @Route("/cron/gpw/{userId}/{date?}/{allowed?}", name="gpw_cron")
      */
     public function execute(
+            int $userId,
             ?string $date,
-            ?int $userId,
             ?int $allowed,
             DownloadFileFromUrl $download,
             Swift_Mailer $mailer,
