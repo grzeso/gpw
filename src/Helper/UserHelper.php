@@ -2,25 +2,20 @@
 
 namespace App\Helper;
 
-use App\Entity\User;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\UserRepository;
 
 class UserHelper
 {
-    /**
-     * @var EntityManager
-     */
-    private static $entityManager;
+    private UserRepository $userRepository;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(UserRepository $userRepository)
     {
-        self::$entityManager = $entityManager;
+        $this->userRepository = $userRepository;
     }
 
-    public static function getUserMails(int $userId): array
+    public function getUserMails(int $userId): array
     {
-        $user = self::$entityManager->getRepository(User::class)->findOneBy(['id' => $userId]);
+        $user = $this->userRepository->findOneBy(['id' => $userId]);
         $mailCollection = $user->getUsersEmails();
 
         $mails = [];
@@ -28,6 +23,7 @@ class UserHelper
         foreach ($mailCollection as $mailEntity) {
             $mails[] = $mailEntity->getEmail();
         }
+
         return $mails;
     }
 }

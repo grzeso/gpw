@@ -3,7 +3,7 @@
 namespace App\Helper;
 
 use App\Entity\DaysWithoutSession;
-use App\Services\Logger\Logger;
+use App\Service\Logger\Logger;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;

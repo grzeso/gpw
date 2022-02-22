@@ -1,20 +1,19 @@
 <?php
 
-namespace App\Services;
+namespace App\Service;
 
-use App\Entity\Stocks;
 use App\Helper\Users\AbstractUser;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\StocksRepository;
 
 class StocksService
 {
-    private $entityManager;
-    private $userStocks;
+    private ?array $userStocks;
     private AbstractUser $user;
+    private StocksRepository $stocksRepository;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(StocksRepository $stocksRepository)
     {
-        $this->entityManager = $entityManager;
+        $this->stocksRepository = $stocksRepository;
     }
 
     public function setUser(AbstractUser $user): void
@@ -24,10 +23,10 @@ class StocksService
 
     public function findUserStocks()
     {
-        $this->userStocks = $this->entityManager->getRepository(Stocks::class)->getUserStocks($this->user->getUserId());
+        $this->userStocks = $this->stocksRepository->getUserStocks($this->user->getUserId());
     }
 
-    public function getUserStocks()
+    public function getUserStocks(): ?array
     {
         return $this->userStocks;
     }

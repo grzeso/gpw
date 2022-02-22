@@ -8,16 +8,11 @@ use App\Helper\AccessHelper;
 use App\Helper\SettingsHelper;
 use App\Helper\UserHelper;
 use App\Helper\Users\UsersFactory;
-use App\Services\CreateExcel;
-use App\Services\DownloadFileFromUrl;
-use App\Services\Excel;
-use App\Services\GpwExcel;
-use App\Services\Logger\Logger;
-use App\Services\SpecialFields\Dto\SpecialFieldsDto;
-use App\Services\StocksService;
+use App\Service\Logger\Logger;
+use App\Service\Providers\GpwProvider;
+use App\Service\Providers\ProviderFactory;
+use DateTime;
 use Exception;
-use PhpOffice\PhpSpreadsheet\Exception as SpreadsheetException;
-use Swift_Attachment;
 use Swift_Mailer;
 use Swift_Message;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,19 +24,17 @@ class GpwCronController extends AbstractController
      * @Route("/cron/gpw/{userId}/{date?}/{allowed?}", name="gpw_cron")
      */
     public function execute(
-            int $userId,
-            ?string $date,
-            ?int $allowed,
-            DownloadFileFromUrl $download,
-            Swift_Mailer $mailer,
-            AccessHelper $accessHelper,
-            UserHelper $userHelper,
-            Excel $excel,
-            StocksService $stocks,
-            GpwExcel $gpwExcel,
-            Logger $logger,
-            SettingsHelper $settingsHelper
-            ) {
+        int $userId,
+        ?string $date,
+        ?int $allowed,
+        Swift_Mailer $mailer,
+        AccessHelper $accessHelper,
+        UserHelper $userHelper,
+        Logger $logger,
+        SettingsHelper $settingsHelper,
+        ProviderFactory $providerFactory,
+        UsersFactory $usersFactory
+    ) {
         if (!$userId) {
             $userId = User::USER_CRON;
         }
@@ -52,16 +45,16 @@ class GpwCronController extends AbstractController
         $settingsHelper->updateLogNumber($logNumber);
 
         $originalDate = $date;
-        if (!$date) {
-            $date = date('d-m-Y');
+        if (!$date = DateTime::createFromFormat('d-m-Y', $date)) {
+            $date = new DateTime();
         }
 
-        $logger->log(Logger::EVENT_START_MESSAGE, $usingUser, Logger::EVENT_START, (int) $logNumber->getValue(), $date, ['userId' => $userId, 'date' => $originalDate ?? '']);
+        $logger->log(Logger::EVENT_START_MESSAGE, $usingUser, Logger::EVENT_START, (int) $logNumber->getValue(), $date->format('d-m-Y'), ['userId' => $userId, 'date' => $originalDate ?? '']);
 
         try {
-            $accessHelper->isAccess($date, $allowed);
+            $accessHelper->isAccess($date->format('d-m-Y'), $allowed);
         } catch (Exception $e) {
-            $logger->log($e->getMessage(), $usingUser, $e->getCode(), (int) $logNumber->getValue(), $date, ['userId' => $userId, 'date' => $originalDate ?? '']);
+            $logger->log($e->getMessage(), $usingUser, $e->getCode(), (int) $logNumber->getValue(), $date->format('d-m-Y'), ['userId' => $userId, 'date' => $originalDate ?? '']);
 
             if (Logger::EVENT_ACCESS_NOT_ALLOWED === $e->getCode()) {
                 exit($e->getMessage());
@@ -69,40 +62,33 @@ class GpwCronController extends AbstractController
         }
 
         $specialData = [
-            'date' => date('Y-m-d', strtotime($date)),
+            'date' => $date->format('Y-m-d'),
         ];
 
         $userId = 1;
 
-        $name = 'GPW_'.$date;
+        $name = 'GPW_'.$date->format('Y-m-d');
 
         $message = new Swift_Message();
         $message->setFrom($this->getParameter('gpw_email'));
 
         try {
-            $user = (new UsersFactory())->factory($userId);
-            $excel->loadFile($download->fasade($date));
-            $stocks->setUser($user);
+            $user = $usersFactory->factory($userId);
 
-            $gpwExcel->setExcel($excel);
-            $gpwExcel->setStocks($stocks);
-
-            $outputExcel = new CreateExcel();
-            $outputExcel->setStocks($stocks);
-            $outputExcel->setGpwExcel($gpwExcel);
-            $outputExcel->create();
-            $specialFieldsDto = (new SpecialFieldsDto($user, $specialData));
-            $outputExcel->setSpecialFields($specialFieldsDto);
-
-            $attachment = new Swift_Attachment($outputExcel->makeAttachement(), $name, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            $provider = $providerFactory->getProvider(GpwProvider::PROVIDER_NAME);
+            $provider->setUser($user);
+            $provider->setDate($date);
+            $provider->setSpecialData($specialData);
+            $provider->execute();
 
             $message
-                   ->attach($attachment);
-        } catch (SpreadsheetException | Exception $e) {
+                   ->attach($provider->getAttachment());
+        } catch (Exception $e) {
             $name = $e->getMessage();
         }
+
         $message
-            ->setTo($userHelper::getUserMails($userId))
+            ->setTo($userHelper->getUserMails($userId))
             ->setSubject($name)
             ->setBody($name);
 

@@ -1,17 +1,29 @@
 <?php
 
-namespace App\Services\SpecialFields\Dto;
+namespace App\Service\SpecialFields\Dto;
 
 use App\Helper\Users\AbstractUser;
+use App\Helper\Users\Grzesiek;
 
 class SpecialFieldsDto
 {
     private array $collection = [];
+    private AbstractUser $user;
+    private array $data;
 
-    public function __construct(AbstractUser $user, array $data)
+    public function __construct(Grzesiek $user)
     {
-        $this->getDefinedFields($user->getDefinedFields());
-        $this->getDynamicFields($user->getDynamicFields(), $data);
+        $this->user = $user;
+    }
+
+    public function setUser(AbstractUser $user)
+    {
+        $this->user = $user;
+    }
+
+    public function setData(array $data)
+    {
+        $this->data = $data;
     }
 
     private function getDefinedFields(array $specialFields): void
@@ -43,6 +55,9 @@ class SpecialFieldsDto
 
     public function get(): array
     {
+        $this->getDefinedFields($this->user->getDefinedFields());
+        $this->getDynamicFields($this->user->getDynamicFields(), $this->data);
+
         return $this->collection;
     }
 }

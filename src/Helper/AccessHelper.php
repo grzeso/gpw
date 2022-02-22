@@ -3,7 +3,7 @@
 namespace App\Helper;
 
 use App\Entity\Log;
-use App\Services\Logger\Logger;
+use App\Service\Logger\Logger;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 

@@ -7,10 +7,10 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Akcje|null find($id, $lockMode = null, $lockVersion = null)
- * @method Akcje|null findOneBy(array $criteria, array $orderBy = null)
- * @method Akcje[]    findAll()
- * @method Akcje[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Stocks|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Stocks|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Stocks[]    findAll()
+ * @method Stocks[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class StocksRepository extends ServiceEntityRepository
 {
@@ -20,7 +20,7 @@ class StocksRepository extends ServiceEntityRepository
     }
 
     // /**
-    //  * @return Akcje[] Returns an array of Akcje objects
+    //  * @return Stocks[] Returns an array of Stocks objects
     //  */
     /*
     public function findByExampleField($value)

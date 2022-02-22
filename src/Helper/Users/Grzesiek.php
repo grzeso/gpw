@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\SpecialFields\Users;
+namespace App\Service\SpecialFields\Users;
 
 namespace App\Helper\Users;
 
