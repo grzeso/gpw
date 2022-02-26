@@ -88,22 +88,18 @@ class ExcelBuilder
 
         for ($row = 1; $row <= $highestRow; ++$row) {
             $name = $activeSheet->getCell('B'.$row);
-            if (in_array($name->getValue(), $userStocksName)) {
-                $stock = new StockDto();
-                $stock->setName($name->getValue());
-                $stock->setValue($activeSheet->getCell('H'.$row)->getValue());
-                $stock->setChange($activeSheet->getCell('I'.$row)->getValue());
 
-                /** @var Stocks $userStock */
-                foreach ($userStocks as $userStock) {
-                    if ($userStock->getName() == $name->getValue()) {
-                        $stock->setPosition($userStock->getPosition());
-                        $stock->setQuantity($userStock->getQuantity());
-                        break;
-                    }
+            /* @var Stocks $userStock */
+            foreach ($userStocks as $userStock) {
+                if (in_array($name->getValue(), $userStocksName) && $userStock->getName() == $name->getValue()) {
+                    $stock = new StockDto();
+                    $stock->setName($name->getValue());
+                    $stock->setValue($activeSheet->getCell('H'.$row)->getValue());
+                    $stock->setChange($activeSheet->getCell('I'.$row)->getValue());
+                    $stock->setPosition($userStock->getPosition());
+                    $stock->setQuantity($userStock->getQuantity());
+                    array_push($userStocksOutput, $stock);
                 }
-
-                array_push($userStocksOutput, $stock);
             }
         }
 
