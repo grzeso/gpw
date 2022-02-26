@@ -10,7 +10,7 @@ class File
     private string $fileName;
 
 //    private $url = 'https://www.gpw.pl/archiwum-notowan?fetch=1&type=10&instrument=&date=';
-    private string $url_dev = 'https://hosting2215173.online.pro/2022-02-15_akcje.xls';
+    private string $url_dev = 'https://hosting2215173.online.pro/akcje/_%s_akcje.xls';
 
     public function __construct(HttpClientInterface $client)
     {
@@ -28,10 +28,9 @@ class File
 //            'GET',
 //            $this->url.$date
 //        );
-
         $response = $this->client->request(
             'GET',
-            $this->url_dev
+            sprintf($this->url_dev, $date)
         );
 
         $this->fileName = tempnam(sys_get_temp_dir(), 'tmpxls');
