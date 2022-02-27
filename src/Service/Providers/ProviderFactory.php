@@ -4,23 +4,20 @@ namespace App\Service\Providers;
 
 class ProviderFactory
 {
-    private GpwProvider $gpwProvider;
-    private MoneyProvider $moneyProvider;
+    private iterable $providers;
 
-    public function __construct(GpwProvider $gpwProvider, MoneyProvider $moneyProvider)
+    public function __construct(iterable $providers)
     {
-        $this->gpwProvider = $gpwProvider;
-        $this->moneyProvider = $moneyProvider;
+        $this->providers = $providers;
     }
 
-    public function getProvider($provider): ?AbstractProvider
+    public function getProvider($appProvider): ?AbstractProvider
     {
-        if (GpwProvider::PROVIDER_NAME === $provider) {
-            return $this->gpwProvider;
-        }
-
-        if (MoneyProvider::PROVIDER_NAME === $provider) {
-            return $this->moneyProvider;
+        /** @var AbstractProvider $provider */
+        foreach ($this->providers as $provider) {
+            if ($provider->check($appProvider)) {
+                return $provider;
+            }
         }
 
         return null;

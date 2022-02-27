@@ -11,6 +11,7 @@ use Swift_Attachment;
 
 abstract class AbstractProvider
 {
+    public const PROVIDER_NAME = '';
     protected AbstractUser $user;
     protected DateTime $date;
     protected array $specialData;
@@ -27,6 +28,11 @@ abstract class AbstractProvider
         $this->specialFieldsDto->setUser($this->user);
         $this->specialFieldsDto->setData($this->specialData);
         $this->excelBuilder->setSpecialFields($this->specialFieldsDto);
+    }
+
+    public function check(string $provider): bool
+    {
+        return static::PROVIDER_NAME === $provider;
     }
 
     public function setUser(AbstractUser $user): void
