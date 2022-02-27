@@ -9,12 +9,12 @@ class GpwFile
     private HttpClientInterface $client;
     private string $fileName;
 
-//    private $url = 'https://www.gpw.pl/archiwum-notowan?fetch=1&type=10&instrument=&date=';
-    private string $url_dev = 'https://hosting2215173.online.pro/akcje/_%s_akcje.xls';
+    private string $gpwSource;
 
-    public function __construct(HttpClientInterface $client)
+    public function __construct(HttpClientInterface $client, string $gpwSource)
     {
         $this->client = $client;
+        $this->gpwSource = $gpwSource;
     }
 
     public function getFileName(): string
@@ -24,13 +24,9 @@ class GpwFile
 
     public function downloadFileByDate(string $date): void
     {
-//        $response = $this->client->request(
-//            'GET',
-//            $this->url.$date
-//        );
         $response = $this->client->request(
             'GET',
-            sprintf($this->url_dev, $date)
+            sprintf($this->gpwSource, $date)
         );
 
         $this->fileName = tempnam(sys_get_temp_dir(), 'tmpxls');

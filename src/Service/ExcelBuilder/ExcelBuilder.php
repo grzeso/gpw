@@ -19,10 +19,12 @@ abstract class ExcelBuilder
     private StocksRepository $stocksRepository;
     private string $dataSource;
     protected AbstractUser $user;
+    private string $devInfo;
 
-    public function __construct(StocksRepository $stocksRepository)
+    public function __construct(string $devInfo, StocksRepository $stocksRepository)
     {
         $this->stocksRepository = $stocksRepository;
+        $this->devInfo = $devInfo;
     }
 
     abstract public function findUserStocks(): array;
@@ -67,6 +69,7 @@ abstract class ExcelBuilder
         }
 
         $worksheet->setCellValue('H8', 'WARTOSC:')->setCellValue('I8', $sum);
+        $worksheet->setCellValue('H10', $this->devInfo);
     }
 
     public function makeFile()

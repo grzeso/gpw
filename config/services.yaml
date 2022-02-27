@@ -19,7 +19,18 @@ services:
         resource: '../src/*'
         exclude: '../src/{DependencyInjection,Entity,Tests,Kernel.php}'
 
+    App\Service\DataSource\ApiMoney:
+        arguments:
+          $moneySource: '%env(string:MONEY_SOURCE)%'
 
+    App\Service\DataSource\GpwFile:
+        arguments:
+          $gpwSource: '%env(string:GPW_SOURCE)%'
+
+    App\Service\ExcelBuilder\:
+      resource: '../src/Service/ExcelBuilder/*'
+      arguments:
+        $devInfo: '%env(string:DEV_INFO)%'
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
