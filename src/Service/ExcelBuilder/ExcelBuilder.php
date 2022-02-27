@@ -1,54 +1,52 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\ExcelBuilder;
 
 use App\Dto\StockDto;
-use App\Entity\Stocks;
 use App\Helper\Users\AbstractUser;
 use App\Repository\StocksRepository;
 use App\Service\SpecialFields\Dto\SpecialFieldsDto;
+use App\Service\StocksService;
 use PhpOffice\PhpSpreadsheet\Exception;
-use PhpOffice\PhpSpreadsheet\Reader\Xls;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-class ExcelBuilder
+abstract class ExcelBuilder
 {
     private Spreadsheet $excelOutput;
-    private StocksService $stocks;
-    private Spreadsheet $excelInput;
+    protected StocksService $stocks;
+    protected Spreadsheet $excelInput;
     private StocksRepository $stocksRepository;
-    private string $fileName;
-    private AbstractUser $user;
+    private string $dataSource;
+    protected AbstractUser $user;
 
     public function __construct(StocksRepository $stocksRepository)
     {
         $this->stocksRepository = $stocksRepository;
     }
 
+    abstract public function findUserStocks(): array;
+
     public function setStocks(StocksService $stocks): void
     {
         $this->stocks = $stocks;
     }
 
-    public function setFileName(string $fileName): void
+    public function setDataSource(string $dataSource): void
     {
-        $this->fileName = $fileName;
+        $this->dataSource = $dataSource;
     }
 
-    public function getFileName(): string
+    public function getDataSource(): string
     {
-        return $this->fileName;
+        return $this->dataSource;
     }
 
     /**
      * @throws Exception
      */
-    public function buildByGpwData()
+    public function build()
     {
-        // excel z gpw
-        $this->excelInput = (new Xls())->load($this->getFileName());
-
         //mój excel
         $this->excelOutput = new Spreadsheet();
         $this->excelOutput->setActiveSheetIndex(0);
@@ -69,41 +67,6 @@ class ExcelBuilder
         }
 
         $worksheet->setCellValue('H8', 'WARTOSC:')->setCellValue('I8', $sum);
-    }
-
-    /**
-     * @refactor - moze refactor
-     *
-     * @throws Exception
-     */
-    public function findUserStocks(): array
-    {
-        $activeSheet = $this->excelInput->getActiveSheet();
-        $this->stocks->setUser($this->user);
-        $userStocksName = $this->stocks->getUserStocksName();
-        $userStocks = $this->stocks->getUserStocks();
-
-        $userStocksOutput = [];
-        $highestRow = $activeSheet->getHighestRow();
-
-        for ($row = 1; $row <= $highestRow; ++$row) {
-            $name = $activeSheet->getCell('B'.$row);
-
-            /* @var Stocks $userStock */
-            foreach ($userStocks as $userStock) {
-                if (in_array($name->getValue(), $userStocksName) && $userStock->getName() == $name->getValue()) {
-                    $stock = new StockDto();
-                    $stock->setName($name->getValue());
-                    $stock->setValue($activeSheet->getCell('H'.$row)->getValue());
-                    $stock->setChange($activeSheet->getCell('I'.$row)->getValue());
-                    $stock->setPosition($userStock->getPosition());
-                    $stock->setQuantity($userStock->getQuantity());
-                    array_push($userStocksOutput, $stock);
-                }
-            }
-        }
-
-        return $userStocksOutput;
     }
 
     public function makeFile()

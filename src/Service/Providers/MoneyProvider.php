@@ -2,27 +2,27 @@
 
 namespace App\Service\Providers;
 
-use App\Service\DataSource\GpwFile;
+use App\Service\DataSource\ApiMoney;
 use App\Service\ExcelBuilder\ExcelBuilder;
-use App\Service\ExcelBuilder\ExcelBuilderByGpw;
+use App\Service\ExcelBuilder\ExcelBuilderByMoney;
 use App\Service\SpecialFields\Dto\SpecialFieldsDto;
 use App\Service\StocksService;
 
-class GpwProvider extends AbstractProvider
+class MoneyProvider extends AbstractProvider
 {
-    public const PROVIDER_NAME = 'GPW';
-    private GpwFile $download;
+    const PROVIDER_NAME = 'MONEY';
+    private ApiMoney $apiMoney;
     protected StocksService $stocks;
     protected SpecialFieldsDto $specialFieldsDto;
     protected ExcelBuilder $excelBuilder;
 
     public function __construct(
-        GpwFile $download,
+        ApiMoney $apiMoney,
         StocksService $stocks,
         SpecialFieldsDto $specialFieldsDto,
-        ExcelBuilderByGpw $excelBuilder
+        ExcelBuilderByMoney $excelBuilder
     ) {
-        $this->download = $download;
+        $this->apiMoney = $apiMoney;
         $this->stocks = $stocks;
         $this->specialFieldsDto = $specialFieldsDto;
         $this->excelBuilder = $excelBuilder;
@@ -30,8 +30,8 @@ class GpwProvider extends AbstractProvider
 
     public function execute()
     {
-        $this->download->downloadFileByDate($this->date->format('Y-m-d'));
-        $this->excelBuilder->setDataSource($this->download->getFileName());
+        $this->apiMoney->downloadDataByDate($this->date->format('Y-m-d'));
+        $this->excelBuilder->setDataSource($this->apiMoney->getData());
 
         parent::execute();
     }

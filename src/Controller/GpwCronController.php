@@ -9,7 +9,7 @@ use App\Helper\SettingsHelper;
 use App\Helper\UserHelper;
 use App\Helper\Users\UsersFactory;
 use App\Service\Logger\Logger;
-use App\Service\Providers\GpwProvider;
+use App\Service\Providers\MoneyProvider;
 use App\Service\Providers\ProviderFactory;
 use DateTime;
 use Exception;
@@ -75,7 +75,7 @@ class GpwCronController extends AbstractController
         try {
             $user = $usersFactory->factory($userId);
 
-            $provider = $providerFactory->getProvider(GpwProvider::PROVIDER_NAME);
+            $provider = $providerFactory->getProvider(MoneyProvider::PROVIDER_NAME);
             $provider->setUser($user);
             $provider->setDate($date);
             $provider->setSpecialData($specialData);

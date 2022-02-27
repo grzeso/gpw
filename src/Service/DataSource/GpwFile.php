@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\DataSource;
 
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class File
+class GpwFile
 {
     private HttpClientInterface $client;
     private string $fileName;
