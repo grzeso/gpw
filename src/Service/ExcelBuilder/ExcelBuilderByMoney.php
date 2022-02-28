@@ -31,10 +31,13 @@ class ExcelBuilderByMoney extends ExcelBuilder
         'LVC' => 'LIVECHAT',
         'CIE' => 'CIECH',
         'NL0015000AU7' => 'PEPCO',
+        'Pepco Group N.V.' => 'PEPCO',
         'SES.s' => 'SESCOM',
         'MRB' => 'MIRBUD',
         'PLGRPRC00015' => 'GRUPRACUJ',
+        'Grupa Pracuj SA' => 'GRUPRACUJ',
         'PLSTSHL00012' => 'STSHOLDING',
+        'STS Holding SA' => 'STSHOLDING',
     ];
 
     private function translate(stdClass $moneyStock): ?string
