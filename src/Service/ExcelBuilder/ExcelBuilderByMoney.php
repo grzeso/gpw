@@ -78,7 +78,7 @@ class ExcelBuilderByMoney extends ExcelBuilder
                 if ($name && in_array($name, $userStocksName) && $userStock->getName() == $name) {
                     $stock = new StockDto();
                     $stock->setName($name);
-                    $stock->setValue($item->close);
+                    $stock->setValue($item->kurs);
                     $stock->setChange(round($item->changePrev, 2));
                     $stock->setPosition($userStock->getPosition());
                     $stock->setQuantity($userStock->getQuantity());
