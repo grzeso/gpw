@@ -52,7 +52,7 @@ class ExcelBuilderByMoney extends ExcelBuilder
         return null;
     }
 
-    public function findUserStocks(): array
+    protected function findUserStocks(): array
     {
         $dataSource = json_decode($this->getDataSource())->data->data;
 

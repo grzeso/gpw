@@ -3,9 +3,9 @@
 namespace App\Service\ExcelBuilder;
 
 use App\Dto\StockDto;
-use App\Helper\Users\AbstractUser;
+use App\Entity\User;
 use App\Repository\StocksRepository;
-use App\Service\SpecialFields\Dto\SpecialFieldsDto;
+use App\Service\Dto\DynamicDataDto;
 use App\Service\StocksService;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -18,8 +18,9 @@ abstract class ExcelBuilder
     protected Spreadsheet $excelInput;
     private StocksRepository $stocksRepository;
     private string $dataSource;
-    protected AbstractUser $user;
+    protected User $user;
     private string $devInfo;
+    private DynamicDataDto $dynamicData;
 
     public function __construct(string $devInfo, StocksRepository $stocksRepository)
     {
@@ -27,7 +28,7 @@ abstract class ExcelBuilder
         $this->devInfo = $devInfo;
     }
 
-    abstract public function findUserStocks(): array;
+    abstract protected function findUserStocks(): array;
 
     public function setStocks(StocksService $stocks): void
     {
@@ -37,6 +38,11 @@ abstract class ExcelBuilder
     public function setDataSource(string $dataSource): void
     {
         $this->dataSource = $dataSource;
+    }
+
+    public function setDynamicData(DynamicDataDto $dynamicData)
+    {
+        $this->dynamicData = $dynamicData;
     }
 
     public function getDataSource(): string
@@ -70,6 +76,9 @@ abstract class ExcelBuilder
 
         $worksheet->setCellValue('H8', 'WARTOSC:')->setCellValue('I8', $sum);
         $worksheet->setCellValue('H10', $this->devInfo);
+
+        $this->setDefinedFields();
+        $this->setDynamicFields();
     }
 
     public function makeFile()
@@ -90,16 +99,23 @@ abstract class ExcelBuilder
         return $attachment;
     }
 
-    public function setSpecialFields(SpecialFieldsDto $specialFieldsDto)
+    private function setDefinedFields(): void
     {
-        $data = $this->excelOutput->getActiveSheet();
-
-        foreach ($specialFieldsDto->get() as $position => $value) {
-            $data->setCellValue($position, $value);
+        $excelOutput = $this->excelOutput->getActiveSheet();
+        foreach (($this->user->getDefinedFields()) as $position => $definedField) {
+            $excelOutput->setCellValue($position, $definedField);
         }
     }
 
-    public function setUser(AbstractUser $user): void
+    private function setDynamicFields()
+    {
+        $excelOutput = $this->excelOutput->getActiveSheet();
+        foreach ($this->user->getDynamicFields() as $position => $dynamicField) {
+            $excelOutput->setCellValue($position, $this->dynamicData->get($dynamicField));
+        }
+    }
+
+    public function setUser(User $user): void
     {
         $this->user = $user;
     }

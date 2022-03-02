@@ -35,6 +35,16 @@ class User
      */
     private $logs;
 
+    /**
+     * @ORM\Column(type="json", nullable=true)
+     */
+    private $definedFields = [];
+
+    /**
+     * @ORM\Column(type="json", nullable=true)
+     */
+    private $dynamicFields = [];
+
     public function __construct()
     {
         $this->usersEmails = new ArrayCollection();
@@ -111,6 +121,30 @@ class User
                 $log->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDefinedFields(): ?array
+    {
+        return $this->definedFields;
+    }
+
+    public function setDefinedFields(?array $definedFields): self
+    {
+        $this->definedFields = $definedFields;
+
+        return $this;
+    }
+
+    public function getDynamicFields(): ?array
+    {
+        return $this->dynamicFields;
+    }
+
+    public function setDynamicFields(?array $dynamicFields): self
+    {
+        $this->dynamicFields = $dynamicFields;
 
         return $this;
     }

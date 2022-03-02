@@ -7,7 +7,7 @@ use App\Entity\User;
 use App\Helper\AccessHelper;
 use App\Helper\SettingsHelper;
 use App\Helper\UserHelper;
-use App\Helper\Users\UsersFactory;
+use App\Service\Dto\DynamicDataDto;
 use App\Service\Logger\Logger;
 use App\Service\Providers\MoneyProvider;
 use App\Service\Providers\ProviderFactory;
@@ -33,13 +33,13 @@ class GpwCronController extends AbstractController
         Logger $logger,
         SettingsHelper $settingsHelper,
         ProviderFactory $providerFactory,
-        UsersFactory $usersFactory
+        DynamicDataDto $dynamicDataDto
     ) {
         if (!$userId) {
             $userId = User::USER_CRON;
         }
-        /** @var User $usingUser */
-        $usingUser = $this->getDoctrine()->getRepository(User::class)->find((int) $userId);
+        /** @var User $user */
+        $user = $this->getDoctrine()->getRepository(User::class)->find((int) $userId);
         /** @var Settings $logNumber */
         $logNumber = $this->getDoctrine()->getRepository(Settings::class)->findOneBy(['name' => 'log_number']);
         $settingsHelper->updateLogNumber($logNumber);
@@ -49,23 +49,19 @@ class GpwCronController extends AbstractController
             $date = new DateTime();
         }
 
-        $logger->log(Logger::EVENT_START_MESSAGE, $usingUser, Logger::EVENT_START, (int) $logNumber->getValue(), $date->format('d-m-Y'), ['userId' => $userId, 'date' => $originalDate ?? '']);
+        $logger->log(Logger::EVENT_START_MESSAGE, $user, Logger::EVENT_START, (int) $logNumber->getValue(), $date->format('d-m-Y'), ['userId' => $userId, 'date' => $originalDate ?? '']);
 
         try {
             $accessHelper->isAccess($date->format('d-m-Y'), $allowed);
         } catch (Exception $e) {
-            $logger->log($e->getMessage(), $usingUser, $e->getCode(), (int) $logNumber->getValue(), $date->format('d-m-Y'), ['userId' => $userId, 'date' => $originalDate ?? '']);
+            $logger->log($e->getMessage(), $user, $e->getCode(), (int) $logNumber->getValue(), $date->format('d-m-Y'), ['userId' => $userId, 'date' => $originalDate ?? '']);
 
             if (Logger::EVENT_ACCESS_NOT_ALLOWED === $e->getCode()) {
                 exit($e->getMessage());
             }
         }
 
-        $specialData = [
-            'date' => $date->format('Y-m-d'),
-        ];
-
-        $userId = 1;
+        $dynamicDataDto->setDate($date->format('Y-m-d'));
 
         $name = 'GPW_'.$date->format('Y-m-d');
 
@@ -73,12 +69,10 @@ class GpwCronController extends AbstractController
         $message->setFrom($this->getParameter('gpw_email'));
 
         try {
-            $user = $usersFactory->factory($userId);
-
             $provider = $providerFactory->getProvider(MoneyProvider::PROVIDER_NAME);
             $provider->setUser($user);
             $provider->setDate($date);
-            $provider->setSpecialData($specialData);
+            $provider->setDynamicData($dynamicDataDto);
             $provider->execute();
 
             $message

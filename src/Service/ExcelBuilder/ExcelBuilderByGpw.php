@@ -14,7 +14,7 @@ class ExcelBuilderByGpw extends ExcelBuilder
      *
      * @throws Exception
      */
-    public function findUserStocks(): array
+    protected function findUserStocks(): array
     {
         // excel z gpw
         $this->excelInput = (new Xls())->load($this->getDataSource());

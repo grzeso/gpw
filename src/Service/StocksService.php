@@ -2,13 +2,13 @@
 
 namespace App\Service;
 
-use App\Helper\Users\AbstractUser;
+use App\Entity\User;
 use App\Repository\StocksRepository;
 
 class StocksService
 {
     private ?array $userStocks;
-    private AbstractUser $user;
+    private User $user;
     private StocksRepository $stocksRepository;
 
     public function __construct(StocksRepository $stocksRepository)
@@ -16,14 +16,14 @@ class StocksService
         $this->stocksRepository = $stocksRepository;
     }
 
-    public function setUser(AbstractUser $user): void
+    public function setUser(User $user): void
     {
         $this->user = $user;
     }
 
     public function findUserStocks()
     {
-        $this->userStocks = $this->stocksRepository->getUserStocks($this->user->getUserId());
+        $this->userStocks = $this->stocksRepository->getUserStocks($this->user->getId());
     }
 
     public function getUserStocks(): ?array

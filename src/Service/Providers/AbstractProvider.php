@@ -2,9 +2,9 @@
 
 namespace App\Service\Providers;
 
-use App\Helper\Users\AbstractUser;
+use App\Entity\User;
+use App\Service\Dto\DynamicDataDto;
 use App\Service\ExcelBuilder\ExcelBuilder;
-use App\Service\SpecialFields\Dto\SpecialFieldsDto;
 use App\Service\StocksService;
 use DateTime;
 use Swift_Attachment;
@@ -12,22 +12,18 @@ use Swift_Attachment;
 abstract class AbstractProvider
 {
     public const PROVIDER_NAME = '';
-    protected AbstractUser $user;
+    protected User $user;
     protected DateTime $date;
-    protected array $specialData;
     protected ExcelBuilder $excelBuilder;
     protected StocksService $stocks;
-    protected SpecialFieldsDto $specialFieldsDto;
+    private DynamicDataDto $dynamicData;
 
     public function execute()
     {
         $this->excelBuilder->setUser($this->user);
         $this->excelBuilder->setStocks($this->stocks);
+        $this->excelBuilder->setDynamicData($this->dynamicData);
         $this->excelBuilder->build();
-
-        $this->specialFieldsDto->setUser($this->user);
-        $this->specialFieldsDto->setData($this->specialData);
-        $this->excelBuilder->setSpecialFields($this->specialFieldsDto);
     }
 
     public function check(string $provider): bool
@@ -35,7 +31,7 @@ abstract class AbstractProvider
         return static::PROVIDER_NAME === $provider;
     }
 
-    public function setUser(AbstractUser $user): void
+    public function setUser(User $user): void
     {
         $this->user = $user;
     }
@@ -45,9 +41,9 @@ abstract class AbstractProvider
         $this->date = $date;
     }
 
-    public function setSpecialData(array $specialData)
+    public function setDynamicData(DynamicDataDto $dynamicDataDto)
     {
-        $this->specialData = $specialData;
+        $this->dynamicData = $dynamicDataDto;
     }
 
     public function getAttachmentName(): string
