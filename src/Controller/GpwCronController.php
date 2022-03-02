@@ -39,7 +39,7 @@ class GpwCronController extends AbstractController
             $userId = User::USER_CRON;
         }
         /** @var User $user */
-        $user = $this->getDoctrine()->getRepository(User::class)->find((int) $userId);
+        $user = $this->getDoctrine()->getRepository(User::class)->find($userId);
         /** @var Settings $logNumber */
         $logNumber = $this->getDoctrine()->getRepository(Settings::class)->findOneBy(['name' => 'log_number']);
         $settingsHelper->updateLogNumber($logNumber);

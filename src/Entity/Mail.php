@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\MailRepository;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -44,12 +45,12 @@ class Mail
         return $this;
     }
 
-    public function getTS(): ?\DateTimeInterface
+    public function getTS(): ?DateTimeInterface
     {
         return $this->TS;
     }
 
-    public function setTS(?\DateTimeInterface $TS): self
+    public function setTS(?DateTimeInterface $TS): self
     {
         $this->TS = $TS;
 

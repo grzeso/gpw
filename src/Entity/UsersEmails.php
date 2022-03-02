@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\UsersEmailsRepository;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -80,12 +81,12 @@ class UsersEmails
         return $this;
     }
 
-    public function getTS(): ?\DateTimeInterface
+    public function getTS(): ?DateTimeInterface
     {
         return $this->TS;
     }
 
-    public function setTS(\DateTimeInterface $TS): self
+    public function setTS(DateTimeInterface $TS): self
     {
         $this->TS = $TS;
 

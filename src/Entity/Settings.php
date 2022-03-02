@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\SettingsRepository;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -61,12 +62,12 @@ class Settings
         return $this;
     }
 
-    public function getTs(): ?\DateTimeInterface
+    public function getTs(): ?DateTimeInterface
     {
         return $this->ts;
     }
 
-    public function setTs(?\DateTimeInterface $ts): self
+    public function setTs(?DateTimeInterface $ts): self
     {
         $this->ts = $ts;
 

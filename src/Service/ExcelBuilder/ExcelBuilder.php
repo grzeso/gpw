@@ -4,7 +4,6 @@ namespace App\Service\ExcelBuilder;
 
 use App\Dto\StockDto;
 use App\Entity\User;
-use App\Repository\StocksRepository;
 use App\Service\Dto\DynamicDataDto;
 use App\Service\StocksService;
 use PhpOffice\PhpSpreadsheet\Exception;
@@ -16,15 +15,13 @@ abstract class ExcelBuilder
     private Spreadsheet $excelOutput;
     protected StocksService $stocks;
     protected Spreadsheet $excelInput;
-    private StocksRepository $stocksRepository;
     private string $dataSource;
     protected User $user;
     private string $devInfo;
     private DynamicDataDto $dynamicData;
 
-    public function __construct(string $devInfo, StocksRepository $stocksRepository)
+    public function __construct(string $devInfo)
     {
-        $this->stocksRepository = $stocksRepository;
         $this->devInfo = $devInfo;
     }
 

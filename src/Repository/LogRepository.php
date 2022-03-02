@@ -55,7 +55,7 @@ class LogRepository extends ServiceEntityRepository
             ->andWhere('l.ts >= :dateStart')
             ->andWhere('l.ts <= :dateEnd')
             ->andWhere('l.eventId = :eventId')
-            ->setParameter('dateStart', $date->setTime(0, 0, 0))
+            ->setParameter('dateStart', $date->setTime(0, 0))
             ->setParameter('dateEnd', $date->setTime(23, 59, 59))
             ->setParameter('eventId', $eventId)
             ->getQuery()
