@@ -38,6 +38,7 @@ class ExcelBuilderByMoney extends ExcelBuilder
         'Grupa Pracuj SA' => 'GRUPRACUJ',
         'PLSTSHL00012' => 'STSHOLDING',
         'STS Holding SA' => 'STSHOLDING',
+        'WOJ' => 'WOJAS',
     ];
 
     private function translate(stdClass $moneyStock): ?string
