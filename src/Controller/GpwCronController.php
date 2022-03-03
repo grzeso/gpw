@@ -6,11 +6,11 @@ use App\Entity\Settings;
 use App\Entity\User;
 use App\Helper\AccessHelper;
 use App\Helper\SettingsHelper;
-use App\Helper\UserHelper;
 use App\Service\Dto\DynamicDataDto;
 use App\Service\Logger\Logger;
 use App\Service\Providers\MoneyProvider;
 use App\Service\Providers\ProviderFactory;
+use App\Service\UserEmailsService;
 use DateTime;
 use Exception;
 use Swift_Mailer;
@@ -29,11 +29,11 @@ class GpwCronController extends AbstractController
         ?int $allowed,
         Swift_Mailer $mailer,
         AccessHelper $accessHelper,
-        UserHelper $userHelper,
         Logger $logger,
         SettingsHelper $settingsHelper,
         ProviderFactory $providerFactory,
-        DynamicDataDto $dynamicDataDto
+        DynamicDataDto $dynamicDataDto,
+        UserEmailsService $userEmailsService
     ) {
         if (!$userId) {
             $userId = User::USER_CRON;
@@ -83,7 +83,7 @@ class GpwCronController extends AbstractController
         }
 
         $message
-            ->setTo($userHelper->getUserMails($userId))
+            ->setTo($userEmailsService->convert($user))
             ->setSubject($name)
             ->setBody($name);
 
