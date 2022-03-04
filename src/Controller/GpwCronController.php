@@ -79,7 +79,19 @@ class GpwCronController extends AbstractController
                    ->attach($provider->getAttachment());
         } catch (Exception $e) {
             $name = $e->getMessage();
-            $logger->log(Logger::EVENT_ERROR_MESSAGE, $user, Logger::EVENT_ERROR, (int) $logNumber->getValue(), $date->format('d-m-Y'), ['error_message' => $name]);
+            $logger->log(
+                Logger::EVENT_ERROR_MESSAGE,
+                $user,
+                Logger::EVENT_ERROR,
+                (int) $logNumber->getValue(),
+                $date->format('d-m-Y'),
+                [
+                    'error_message' => $e->getMessage(),
+                    'error_mfile' => $e->getFile(),
+                    'error_line' => $e->getLine(),
+                    'error_trace' => $e->getTrace(),
+                ]
+            );
         }
 
         $message
@@ -95,7 +107,8 @@ class GpwCronController extends AbstractController
             Logger::EVENT_SENT,
             (int) $logNumber->getValue(),
             $date->format('d-m-Y'),
-            ['sent_result' => $result]);
+            ['sent_result' => $result]
+        );
 
         return $this->render('gpw_cron/index.html.twig');
     }
