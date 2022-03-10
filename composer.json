@@ -14,6 +14,7 @@
         "doctrine/orm": "^2.8",
         "friendsofphp/php-cs-fixer": "^2.18",
         "phpoffice/phpspreadsheet": "^1.16",
+        "sensio/framework-extra-bundle": "^6.2",
         "squizlabs/php_codesniffer": "*",
         "symfony/console": "5.2.*",
         "symfony/dependency-injection": "5.2.*",

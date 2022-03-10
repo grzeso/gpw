@@ -3,9 +3,11 @@
 namespace App\Service\Logger;
 
 use App\Entity\Log;
+use App\Entity\Settings;
 use App\Entity\User;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 
 class Logger
 {
@@ -24,24 +26,87 @@ class Logger
     public const EVENT_SENT_MESSAGE = 'Czy wyslany';
 
     private EntityManagerInterface $entityManager;
+    private User $user;
+    private Settings $settings;
+    private DateTime $date;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
     }
 
-    public function log(string $description, User $user, int $eventId, int $useId, string $dateLookingFor, $params = null)
+    public function setUser(User $user): void
+    {
+        $this->user = $user;
+    }
+
+    public function setLogId(Settings $settings): void
+    {
+        $this->settings = $settings;
+    }
+
+    public function setDate(DateTime $date)
+    {
+        $this->date = $date;
+    }
+
+    public function log(string $description, int $eventId, $params = null)
     {
         $log = new Log();
         $log->setDescription($description);
-        $log->setUser($user);
+        $log->setUser($this->user);
         $log->setEventId($eventId);
-        $log->setUseId($useId);
-        $log->setDate($dateLookingFor);
+        $log->setUseId((int) $this->settings->getValue());
+        $log->setDate($this->date->format('d-m-Y'));
         $log->setParams(json_encode($params, JSON_FORCE_OBJECT));
         $log->setTs(new DateTime());
 
         $this->entityManager->persist($log);
         $this->entityManager->flush();
+    }
+
+    public function logError(Exception $e)
+    {
+        $this->log(
+            Logger::EVENT_ERROR_MESSAGE,
+            Logger::EVENT_ERROR,
+            [
+                'error_message' => $e->getMessage(),
+                'error_mfile' => $e->getFile(),
+                'error_line' => $e->getLine(),
+                'error_trace' => $e->getTrace(),
+            ]
+        );
+    }
+
+    public function logSent(int $result)
+    {
+        $this->log(
+            self::EVENT_SENT_MESSAGE,
+            self::EVENT_SENT,
+            [
+                'sent_result' => $result,
+            ]
+        );
+    }
+
+    public function logStart(int $userId, string $originalDate)
+    {
+        $this->log(
+            self::EVENT_START_MESSAGE,
+            self::EVENT_START,
+            [
+                'userId' => $userId,
+                'date' => $originalDate,
+            ]
+        );
+    }
+
+    public function logNoAccess(Exception $e)
+    {
+        $this->log(
+            $e->getMessage(),
+            $e->getCode(),
+        );
     }
 }
