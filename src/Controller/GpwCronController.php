@@ -4,8 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Settings;
 use App\Entity\User;
-use App\Helper\AccessHelper;
 use App\Helper\SettingsHelper;
+use App\Service\Access\AccessService;
 use App\Service\Dto\DynamicDataDto;
 use App\Service\Logger\Logger;
 use App\Service\Providers\MoneyProvider;
@@ -28,12 +28,12 @@ class GpwCronController extends AbstractController
         ?string $date,
         ?int $allowed,
         Swift_Mailer $mailer,
-        AccessHelper $accessHelper,
         Logger $logger,
         SettingsHelper $settingsHelper,
         ProviderFactory $providerFactory,
         DynamicDataDto $dynamicDataDto,
-        UserEmailsService $userEmailsService
+        UserEmailsService $userEmailsService,
+        AccessService $accessService
     ) {
         if (!$userId) {
             $userId = User::USER_CRON;
@@ -52,7 +52,7 @@ class GpwCronController extends AbstractController
         $logger->log(Logger::EVENT_START_MESSAGE, $user, Logger::EVENT_START, (int) $logNumber->getValue(), $date->format('d-m-Y'), ['userId' => $userId, 'date' => $originalDate ?? '']);
 
         try {
-            $accessHelper->isAccess($date->format('d-m-Y'), $allowed);
+            $accessService->isAccess($date->format('d-m-Y'), $allowed);
         } catch (Exception $e) {
             $logger->log($e->getMessage(), $user, $e->getCode(), (int) $logNumber->getValue(), $date->format('d-m-Y'), ['userId' => $userId, 'date' => $originalDate ?? '']);
 
