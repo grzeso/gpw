@@ -2,15 +2,13 @@
 
 namespace App\Controller;
 
-use App\Entity\Settings;
 use App\Entity\User;
-use App\Helper\SettingsHelper;
-use App\Repository\SettingsRepository;
 use App\Service\Access\AccessService;
 use App\Service\Dto\DynamicDataDto;
 use App\Service\Logger\Logger;
 use App\Service\Providers\MoneyProvider;
 use App\Service\Providers\ProviderFactory;
+use App\Service\Settings\SettingsService;
 use App\Service\UserEmailsService;
 use DateTime;
 use Exception;
@@ -31,25 +29,21 @@ class GpwCronController extends AbstractController
         User $user,
         Swift_Mailer $mailer,
         Logger $logger,
-        SettingsHelper $settingsHelper,
         ProviderFactory $providerFactory,
         DynamicDataDto $dynamicDataDto,
         UserEmailsService $userEmailsService,
         AccessService $accessService,
-        SettingsRepository $settingsRepository
+        SettingsService $settingsService
     ): Response {
-        /** @var Settings $logNumber */
-        $logNumber = $settingsRepository->findOneBy(['name' => 'log_number']);
-        $settingsHelper->updateLogNumber($logNumber);
-
         if (!$date = DateTime::createFromFormat('d-m-Y', $originalDate)) {
             $date = new DateTime();
         }
 
         $logger->setUser($user);
-        $logger->setLogId($logNumber);
+        $logger->setLogId($settingsService->getLogNumber());
         $logger->setDate($date);
         $logger->logStart($id, $originalDate ?? '');
+        $settingsService->updateLogNumber();
 
         $message = $mailer->createMessage();
 
