@@ -3,51 +3,29 @@
 namespace App\Service\ExcelBuilder;
 
 use App\Dto\StockDto;
+use App\Entity\NameDictionary;
 use App\Entity\Stocks;
 use stdClass;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class ExcelBuilderByMoney extends ExcelBuilder
 {
-    private array $translate = [
-        'BDX' => 'BUDIMEX',
-        'CDR' => 'CDPROJEKT',
-        'EAT' => 'AMREST',
-        'ALE' => 'ALLEGRO',
-        'PKO' => 'PKOBP',
-        'PZU' => 'PZU',
-        '11B' => '11BIT',
-        'JSW' => 'JSW',
-        'KGH' => 'KGHM',
-        'ALR' => 'ALIOR',
-        'LTS' => 'LOTOS',
-        'PEO' => 'PEKAO',
-        'PKN' => 'PKNORLEN',
-        'CCC' => 'CCC',
-        'DNP' => 'DINOPL',
-        'KRU' => 'KRUK',
-        'ACP' => 'ASSECOPOL',
-        'OPL' => 'ORANGEPL',
-        'CIG' => 'CIGAMES',
-        'LVC' => 'LIVECHAT',
-        'CIE' => 'CIECH',
-        'NL0015000AU7' => 'PEPCO',
-        'Pepco Group N.V.' => 'PEPCO',
-        'SES.s' => 'SESCOM',
-        'MRB' => 'MIRBUD',
-        'PLGRPRC00015' => 'GRUPRACUJ',
-        'Grupa Pracuj SA' => 'GRUPRACUJ',
-        'PLSTSHL00012' => 'STSHOLDING',
-        'STS Holding SA' => 'STSHOLDING',
-        'WOJ' => 'WOJAS',
-    ];
-
     private function translate(stdClass $moneyStock): ?string
     {
-        if (array_key_exists($moneyStock->symbol, $this->translate)) {
-            return $this->translate[$moneyStock->symbol];
-        }
-        if (array_key_exists($moneyStock->nazwaPelna, $this->translate)) {
-            return $this->translate[$moneyStock->nazwaPelna];
+        $cache = new FilesystemAdapter();
+
+        $values = $cache->get('dictionary.money', function (ItemInterface $item) {
+            $item->expiresAfter(10);
+
+            return $this->dictionaryRepository->findBy(['provider' => 1]);
+        });
+
+        /** @var NameDictionary $value */
+        foreach ($values as $value) {
+            if ($moneyStock->symbol === $value->getTheirName() || $moneyStock->nazwaPelna === $value->getTheirName()) {
+                return $value->getMyName();
+            }
         }
 
         return null;
