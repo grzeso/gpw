@@ -6,7 +6,6 @@ use App\Entity\User;
 use App\Service\Access\AccessService;
 use App\Service\Dto\DynamicDataDto;
 use App\Service\Logger\Logger;
-use App\Service\Providers\MoneyProvider;
 use App\Service\Providers\ProviderFactory;
 use App\Service\Settings\SettingsService;
 use App\Service\UserEmailsService;
@@ -52,7 +51,7 @@ class GpwCronController extends AbstractController
             $accessService->isAccess($date, $allowed);
             $dynamicDataDto->setDate($date);
 
-            $provider = $providerFactory->getProvider(MoneyProvider::PROVIDER_NAME);
+            $provider = $providerFactory->getProvider($this->getParameter('gpw.provider'));
             $provider->setUser($user);
             $provider->setDate($date);
             $provider->setDynamicData($dynamicDataDto);
@@ -67,7 +66,7 @@ class GpwCronController extends AbstractController
         }
 
         $message
-            ->setFrom($this->getParameter('gpw_email'))
+            ->setFrom($this->getParameter('gpw.email'))
             ->setTo($userEmailsService->convert($user))
             ->setSubject($name)
             ->setBody($name);
