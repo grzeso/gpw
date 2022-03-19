@@ -167,7 +167,7 @@ Config file
 -----------
 
 Instead of using command line options to customize the rule, you can save the
-project configuration in a <comment>.php_cs.dist</comment> file in the root directory of your project.
+project configuration in a <comment>.php-cs-fixer.dist.php</comment> file in the root directory of your project.
 The file must return an instance of `PhpCsFixer\ConfigInterface` (<url>%%%CONFIG_INTERFACE_URL%%%</url>)
 which lets you configure the rules, the files and directories that
 need to be analyzed. You may also create <comment>.php_cs</comment> file, which is
@@ -269,7 +269,7 @@ Cache file can be specified via `--cache-file` option or config file:
 
     $config = new Config();
 
-    return $config->setCacheFile(__DIR__.'/.php_cs.cache');
+    return $config->setCacheFile(__DIR__.'/.php-cs-fixer.cache');
 
     ?>
 
@@ -308,7 +308,9 @@ EOF
                 self::getLatestReleaseVersionFromChangeLog()
             ),
             '%%%CI_INTEGRATION%%%' => implode("\n", array_map(
-                static function ($line) { return '    $ '.$line; },
+                static function ($line) {
+                    return '    $ '.$line;
+                },
                 \array_slice(file(__DIR__.'/../../../ci-integration.sh', FILE_IGNORE_NEW_LINES), 3)
             )),
             '%%%FIXERS_DETAILS%%%' => self::getFixersHelp(),
@@ -331,7 +333,7 @@ EOF
     /**
      * Returns the allowed values of the given option that can be converted to a string.
      *
-     * @return null|array
+     * @return array|null
      */
     public static function getDisplayableAllowedValues(FixerOptionInterface $option)
     {
@@ -389,11 +391,7 @@ EOF
         if (false === $changelog) {
             $error = error_get_last();
 
-            throw new \RuntimeException(sprintf(
-                'Failed to read content of the changelog file "%s".%s',
-                $changelogFile,
-                $error ? ' '.$error['message'] : ''
-            ));
+            throw new \RuntimeException(sprintf('Failed to read content of the changelog file "%s".%s', $changelogFile, $error ? ' '.$error['message'] : ''));
         }
 
         for ($i = Application::getMajorVersion(); $i > 0; --$i) {
@@ -420,7 +418,7 @@ EOF
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     private static function getChangeLogFile()
     {

@@ -58,17 +58,17 @@ final class ConfigurationResolver
     const PATH_MODE_INTERSECTION = 'intersection';
 
     /**
-     * @var null|bool
+     * @var bool|null
      */
     private $allowRisky;
 
     /**
-     * @var null|ConfigInterface
+     * @var ConfigInterface|null
      */
     private $config;
 
     /**
-     * @var null|string
+     * @var string|null
      */
     private $configFile;
 
@@ -83,27 +83,27 @@ final class ConfigurationResolver
     private $defaultConfig;
 
     /**
-     * @var null|ReporterInterface
+     * @var ReporterInterface|null
      */
     private $reporter;
 
     /**
-     * @var null|bool
+     * @var bool|null
      */
     private $isStdIn;
 
     /**
-     * @var null|bool
+     * @var bool|null
      */
     private $isDryRun;
 
     /**
-     * @var null|FixerInterface[]
+     * @var FixerInterface[]|null
      */
     private $fixers;
 
     /**
-     * @var null|bool
+     * @var bool|null
      */
     private $configFinderIsOverridden;
 
@@ -168,7 +168,7 @@ final class ConfigurationResolver
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getCacheFile()
     {
@@ -249,7 +249,7 @@ final class ConfigurationResolver
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getConfigFile()
     {
@@ -267,9 +267,15 @@ final class ConfigurationResolver
     {
         if (null === $this->differ) {
             $mapper = [
-                'null' => static function () { return new NullDiffer(); },
-                'sbd' => static function () { return new SebastianBergmannDiffer(); },
-                'udiff' => static function () { return new UnifiedDiffer(); },
+                'null' => static function () {
+                    return new NullDiffer();
+                },
+                'sbd' => static function () {
+                    return new SebastianBergmannDiffer();
+                },
+                'udiff' => static function () {
+                    return new UnifiedDiffer();
+                },
             ];
 
             if (!$this->options['diff']) {
@@ -285,20 +291,13 @@ final class ConfigurationResolver
                 : $defaultOption;
 
             if (!\is_string($option)) {
-                throw new InvalidConfigurationException(sprintf(
-                    '"diff-format" must be a string, "%s" given.',
-                    \gettype($option)
-                ));
+                throw new InvalidConfigurationException(sprintf('"diff-format" must be a string, "%s" given.', \gettype($option)));
             }
 
             if (is_subclass_of($option, DifferInterface::class)) {
                 $this->differ = new $option();
             } elseif (!isset($mapper[$option])) {
-                throw new InvalidConfigurationException(sprintf(
-                    '"diff-format" must be any of "%s", got "%s".',
-                    implode('", "', array_keys($mapper)),
-                    $option
-                ));
+                throw new InvalidConfigurationException(sprintf('"diff-format" must be any of "%s", got "%s".', implode('", "', array_keys($mapper)), $option));
             } else {
                 $this->differ = $mapper[$option]();
             }
@@ -403,10 +402,7 @@ final class ConfigurationResolver
                             : $cwd.\DIRECTORY_SEPARATOR.$path;
 
                         if (!file_exists($absolutePath)) {
-                            throw new InvalidConfigurationException(sprintf(
-                                'The path "%s" is not readable.',
-                                $path
-                            ));
+                            throw new InvalidConfigurationException(sprintf('The path "%s" is not readable.', $path));
                         }
 
                         return $absolutePath;
@@ -440,11 +436,7 @@ final class ConfigurationResolver
 
                     $progressType = $this->getConfig()->getHideProgress() ? 'none' : $default;
                 } elseif (!\in_array($progressType, $progressTypes, true)) {
-                    throw new InvalidConfigurationException(sprintf(
-                        'The progress type "%s" is not defined, supported are "%s".',
-                        $progressType,
-                        implode('", "', $progressTypes)
-                    ));
+                    throw new InvalidConfigurationException(sprintf('The progress type "%s" is not defined, supported are "%s".', $progressType, implode('", "', $progressTypes)));
                 } elseif (\in_array($progressType, ['estimating', 'estimating-max', 'run-in'], true)) {
                     $message = 'Passing `estimating`, `estimating-max` or `run-in` is deprecated and will not be supported in 3.0, use `none` or `dots` instead.';
 
@@ -609,12 +601,12 @@ final class ConfigurationResolver
 
         $candidates = [
             $configDir.\DIRECTORY_SEPARATOR.'.php_cs',
-            $configDir.\DIRECTORY_SEPARATOR.'.php_cs.dist',
+            $configDir.\DIRECTORY_SEPARATOR.'.php-cs-fixer.dist.php',
         ];
 
         if ($configDir !== $this->cwd) {
             $candidates[] = $this->cwd.\DIRECTORY_SEPARATOR.'.php_cs';
-            $candidates[] = $this->cwd.\DIRECTORY_SEPARATOR.'.php_cs.dist';
+            $candidates[] = $this->cwd.\DIRECTORY_SEPARATOR.'.php-cs-fixer.dist.php';
         }
 
         return $candidates;
@@ -815,11 +807,7 @@ final class ConfigurationResolver
             $modes,
             true
         )) {
-            throw new InvalidConfigurationException(sprintf(
-                'The path-mode "%s" is not defined, supported are "%s".',
-                $this->options['path-mode'],
-                implode('", "', $modes)
-            ));
+            throw new InvalidConfigurationException(sprintf('The path-mode "%s" is not defined, supported are "%s".', $this->options['path-mode'], implode('", "', $modes)));
         }
 
         $isIntersectionPathMode = self::PATH_MODE_INTERSECTION === $this->options['path-mode'];
@@ -862,9 +850,7 @@ final class ConfigurationResolver
 
         if ($isIntersectionPathMode) {
             if (null === $nestedFinder) {
-                throw new InvalidConfigurationException(
-                    'Cannot create intersection with not-fully defined Finder in configuration file.'
-                );
+                throw new InvalidConfigurationException('Cannot create intersection with not-fully defined Finder in configuration file.');
             }
 
             return new \CallbackFilterIterator(
