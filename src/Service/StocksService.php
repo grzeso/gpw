@@ -2,12 +2,16 @@
 
 namespace App\Service;
 
+use App\Entity\Stocks;
 use App\Entity\User;
 use App\Repository\StocksRepository;
 
 class StocksService
 {
-    private ?array $userStocks;
+    /**
+     * @var array<Stocks>
+     */
+    private array $userStocks;
     private User $user;
     private StocksRepository $stocksRepository;
 
@@ -21,20 +25,26 @@ class StocksService
         $this->user = $user;
     }
 
-    public function findUserStocks()
+    public function findUserStocks(): void
     {
         $this->userStocks = $this->stocksRepository->getUserStocks($this->user->getId());
     }
 
+    /**
+     * @return array<Stocks>
+     */
     public function getUserStocks(): ?array
     {
         return $this->userStocks;
     }
 
+    /**
+     * @return array<int, string|null>
+     */
     public function getUserStocksName(): array
     {
         $this->findUserStocks();
 
-        return array_map(function ($stock) { return $stock->getName(); }, $this->userStocks);
+        return array_map(function (Stocks $stock) { return $stock->getName(); }, $this->userStocks);
     }
 }

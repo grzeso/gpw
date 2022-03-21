@@ -28,6 +28,9 @@ abstract class ExcelBuilder
         $this->dictionaryRepository = $dictionaryRepository;
     }
 
+    /**
+     * @return array<int, StockDto>
+     */
     abstract protected function findUserStocks(): array;
 
     public function setStocks(StocksService $stocks): void
@@ -40,7 +43,7 @@ abstract class ExcelBuilder
         $this->dataSource = $dataSource;
     }
 
-    public function setDynamicData(DynamicDataDto $dynamicData)
+    public function setDynamicData(DynamicDataDto $dynamicData): void
     {
         $this->dynamicData = $dynamicData;
     }
@@ -53,7 +56,7 @@ abstract class ExcelBuilder
     /**
      * @throws Exception
      */
-    public function build()
+    public function build(): void
     {
         //mój excel
         $this->excelOutput = new Spreadsheet();
@@ -81,7 +84,7 @@ abstract class ExcelBuilder
         $this->setDynamicFields();
     }
 
-    public function makeFile()
+    public function makeFile(): void
     {
         $writer = new Xlsx($this->excelOutput);
 
@@ -107,7 +110,7 @@ abstract class ExcelBuilder
         }
     }
 
-    private function setDynamicFields()
+    private function setDynamicFields(): void
     {
         $excelOutput = $this->excelOutput->getActiveSheet();
         foreach ($this->user->getDynamicFields() as $position => $dynamicField) {

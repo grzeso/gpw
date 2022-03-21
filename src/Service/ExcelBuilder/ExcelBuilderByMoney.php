@@ -31,6 +31,9 @@ class ExcelBuilderByMoney extends ExcelBuilder
         return null;
     }
 
+    /**
+     * @return array<int, StockDto>
+     */
     protected function findUserStocks(): array
     {
         $dataSource = json_decode($this->getDataSource())->data->data;

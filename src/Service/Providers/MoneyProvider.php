@@ -24,7 +24,7 @@ class MoneyProvider extends AbstractProvider
         $this->excelBuilder = $excelBuilder;
     }
 
-    public function execute()
+    public function execute(): void
     {
         $this->apiMoney->downloadDataByDate($this->date->format('Y-m-d'));
         $this->excelBuilder->setDataSource($this->apiMoney->getData());

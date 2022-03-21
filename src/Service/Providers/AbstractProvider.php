@@ -18,7 +18,7 @@ abstract class AbstractProvider
     protected StocksService $stocks;
     private DynamicDataDto $dynamicData;
 
-    public function execute()
+    public function execute(): void
     {
         $this->excelBuilder->setUser($this->user);
         $this->excelBuilder->setStocks($this->stocks);
@@ -36,12 +36,12 @@ abstract class AbstractProvider
         $this->user = $user;
     }
 
-    public function setDate(DateTime $date)
+    public function setDate(DateTime $date): void
     {
         $this->date = $date;
     }
 
-    public function setDynamicData(DynamicDataDto $dynamicDataDto)
+    public function setDynamicData(DynamicDataDto $dynamicDataDto): void
     {
         $this->dynamicData = $dynamicDataDto;
     }

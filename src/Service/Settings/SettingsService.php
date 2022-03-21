@@ -24,7 +24,7 @@ class SettingsService
         return $this->settings;
     }
 
-    public function updateLogNumber()
+    public function updateLogNumber(): void
     {
         $oldNumber = (int) $this->settings->getValue();
         ++$oldNumber;

@@ -45,12 +45,15 @@ class Logger
         $this->settings = $settings;
     }
 
-    public function setDate(DateTime $date)
+    public function setDate(DateTime $date): void
     {
         $this->date = $date;
     }
 
-    public function log(string $description, int $eventId, $params = null)
+    /**
+     * @param array<string, string|int>|null $params
+     */
+    public function log(string $description, int $eventId, array $params = null): void
     {
         $log = new Log();
         $log->setDescription($description);
@@ -65,7 +68,7 @@ class Logger
         $this->entityManager->flush();
     }
 
-    public function logError(Exception $e)
+    public function logError(Exception $e): void
     {
         $this->log(
             Logger::EVENT_ERROR_MESSAGE,
@@ -74,12 +77,12 @@ class Logger
                 'error_message' => $e->getMessage(),
                 'error_mfile' => $e->getFile(),
                 'error_line' => $e->getLine(),
-                'error_trace' => $e->getTrace(),
+                'error_trace' => json_encode($e->getTrace()),
             ]
         );
     }
 
-    public function logSent(int $result)
+    public function logSent(int $result): void
     {
         $this->log(
             self::EVENT_SENT_MESSAGE,
@@ -90,7 +93,7 @@ class Logger
         );
     }
 
-    public function logStart(int $userId, string $originalDate)
+    public function logStart(int $userId, string $originalDate): void
     {
         $this->log(
             self::EVENT_START_MESSAGE,
@@ -102,7 +105,7 @@ class Logger
         );
     }
 
-    public function logNoAccess(Exception $e)
+    public function logNoAccess(Exception $e): void
     {
         $this->log(
             $e->getMessage(),

@@ -24,7 +24,7 @@ class GpwProvider extends AbstractProvider
         $this->excelBuilder = $excelBuilder;
     }
 
-    public function execute()
+    public function execute(): void
     {
         $this->download->downloadFileByDate($this->date->format('Y-m-d'));
         $this->excelBuilder->setDataSource($this->download->getFileName());

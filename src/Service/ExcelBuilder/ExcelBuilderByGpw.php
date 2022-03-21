@@ -4,7 +4,6 @@ namespace App\Service\ExcelBuilder;
 
 use App\Dto\StockDto;
 use App\Entity\Stocks;
-use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Reader\Xls;
 
 class ExcelBuilderByGpw extends ExcelBuilder
@@ -12,7 +11,7 @@ class ExcelBuilderByGpw extends ExcelBuilder
     /**
      * @refactor - moze refactor
      *
-     * @throws Exception
+     * @return array<int, StockDto>
      */
     protected function findUserStocks(): array
     {

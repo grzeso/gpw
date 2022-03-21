@@ -6,6 +6,9 @@ use App\Entity\User;
 
 class UserEmailsService
 {
+    /**
+     * @return array<int, string|null>
+     */
     public function convert(User $user): array
     {
         $mailCollection = $user->getUsersEmails();

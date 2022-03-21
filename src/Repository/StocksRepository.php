@@ -48,7 +48,10 @@ class StocksRepository extends ServiceEntityRepository
     }
     */
 
-    public function getUserStocks(int $user_id): ?array
+    /**
+     * @return Stocks[]|null
+     */
+    public function getUserStocks(int $user_id): array
     {
         return $this->findBy(['user_id' => $user_id]);
     }
