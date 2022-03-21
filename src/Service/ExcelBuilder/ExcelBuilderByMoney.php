@@ -54,7 +54,7 @@ class ExcelBuilderByMoney extends ExcelBuilder
 
             /* @var Stocks $userStock */
             foreach ($userStocks as $userStock) {
-                if ($name && in_array($name, $userStocksName) && $userStock->getName() == $name) {
+                if (in_array($name, $userStocksName) && $userStock->getName() == $name) {
                     $stock = new StockDto();
                     $stock->setName($name);
                     $stock->setValue($item->kurs);
