@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Repository\NameDictionaryRepository;
 use App\Service\Dto\DynamicDataDto;
 use App\Service\StocksService;
+use DateTime;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -18,6 +19,7 @@ abstract class ExcelBuilder
     protected Spreadsheet $excelInput;
     private string $dataSource;
     protected User $user;
+    protected DateTime $date;
     private string $devInfo;
     private DynamicDataDto $dynamicData;
     protected NameDictionaryRepository $dictionaryRepository;
@@ -53,6 +55,16 @@ abstract class ExcelBuilder
         return $this->dataSource;
     }
 
+    public function getDate(): DateTime
+    {
+        return $this->date;
+    }
+
+    public function setDate(DateTime $date): void
+    {
+        $this->date = $date;
+    }
+
     /**
      * @throws Exception
      */
@@ -63,6 +75,7 @@ abstract class ExcelBuilder
         $this->excelOutput->setActiveSheetIndex(0);
 
         $worksheet = $this->excelOutput->getActiveSheet();
+        $worksheet->setTitle($this->getDate()->format('Y-m-d'));
 
         $sum = 0;
 

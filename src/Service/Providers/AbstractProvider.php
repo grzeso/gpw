@@ -7,6 +7,7 @@ use App\Service\Dto\DynamicDataDto;
 use App\Service\ExcelBuilder\ExcelBuilder;
 use App\Service\StocksService;
 use DateTime;
+use PhpOffice\PhpSpreadsheet\Exception;
 use Swift_Attachment;
 
 abstract class AbstractProvider
@@ -18,9 +19,13 @@ abstract class AbstractProvider
     protected StocksService $stocks;
     private DynamicDataDto $dynamicData;
 
+    /**
+     * @throws Exception
+     */
     public function execute(): void
     {
         $this->excelBuilder->setUser($this->user);
+        $this->excelBuilder->setDate($this->getDate());
         $this->excelBuilder->setStocks($this->stocks);
         $this->excelBuilder->setDynamicData($this->dynamicData);
         $this->excelBuilder->build();
@@ -41,6 +46,11 @@ abstract class AbstractProvider
         $this->date = $date;
     }
 
+    public function getDate(): DateTime
+    {
+        return $this->date;
+    }
+
     public function setDynamicData(DynamicDataDto $dynamicDataDto): void
     {
         $this->dynamicData = $dynamicDataDto;
@@ -48,7 +58,7 @@ abstract class AbstractProvider
 
     public function getAttachmentName(): string
     {
-        return 'GPW_'.$this->date->format('Y-m-d');
+        return 'GPW_'.$this->getDate()->format('Y-m-d');
     }
 
     public function getAttachment(): Swift_Attachment
