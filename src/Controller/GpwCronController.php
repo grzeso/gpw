@@ -37,12 +37,12 @@ class GpwCronController extends AbstractController
         if (!$date = DateTime::createFromFormat('d-m-Y', $originalDate)) {
             $date = new DateTime();
         }
+        $settingsService->updateLogNumber();
 
         $logger->setUser($user);
         $logger->setLogId($settingsService->getLogNumber());
         $logger->setDate($date);
         $logger->logStart($id, $originalDate ?? '');
-        $settingsService->updateLogNumber();
 
         $message = $mailer->createMessage();
 
