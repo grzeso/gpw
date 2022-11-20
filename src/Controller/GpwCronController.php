@@ -11,9 +11,11 @@ use App\Service\Settings\SettingsService;
 use App\Service\UserEmailsService;
 use DateTime;
 use Exception;
-use Swift_Mailer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 
 class GpwCronController extends AbstractController
@@ -26,7 +28,7 @@ class GpwCronController extends AbstractController
         ?string $originalDate,
         ?int $allowed,
         User $user,
-        Swift_Mailer $mailer,
+        MailerInterface $mailer,
         Logger $logger,
         ProviderFactory $providerFactory,
         DynamicDataDto $dynamicDataDto,
@@ -44,7 +46,7 @@ class GpwCronController extends AbstractController
         $logger->setDate($date);
         $logger->logStart($id, $originalDate ?? '');
 
-        $message = $mailer->createMessage();
+        $message = new Email();
 
         try {
             $accessService->setLogger($logger);
@@ -59,21 +61,24 @@ class GpwCronController extends AbstractController
 
             $name = 'GPW_'.$date->format('Y-m-d');
 
-            $message->attach($provider->getAttachment());
+            $message->attach($provider->getBody(), $provider->getAttachmentName(), $provider->getType());
         } catch (Exception $e) {
             $name = $e->getMessage();
             $logger->logError($e);
         }
 
         $message
-            ->setFrom($this->getParameter('gpw.email'))
-            ->setTo($userEmailsService->convert($user))
-            ->setSubject($name)
-            ->setBody($name);
+            ->from($this->getParameter('gpw.email'))
+            ->to(...$userEmailsService->convert($user))
+            ->subject($name)
+            ->html($name);
 
-        $result = $mailer->send($message);
-
-        $logger->logSent($result);
+        try {
+            $mailer->send($message);
+            $logger->logSent(1);
+        } catch (TransportExceptionInterface $e) {
+            $logger->logSent(0);
+        }
 
         return $this->render('gpw_cron/index.html.twig');
     }

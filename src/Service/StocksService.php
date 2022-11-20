@@ -27,7 +27,7 @@ class StocksService
 
     public function findUserStocks(): void
     {
-        $this->userStocks = $this->stocksRepository->getUserStocks($this->user->getId());
+        $this->userStocks = $this->stocksRepository->findBy(['user_id' => $this->user->getId()]);
     }
 
     /**

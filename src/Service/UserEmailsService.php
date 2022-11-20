@@ -3,11 +3,12 @@
 namespace App\Service;
 
 use App\Entity\User;
+use Symfony\Component\Mime\Address;
 
 class UserEmailsService
 {
     /**
-     * @return array<int, string|null>
+     * @return array<int, Address>
      */
     public function convert(User $user): array
     {
@@ -15,7 +16,7 @@ class UserEmailsService
         $mails = [];
 
         foreach ($mailCollection as $mailEntity) {
-            $mails[] = $mailEntity->getEmail();
+            $mails[] = new Address($mailEntity->getEmail());
         }
 
         return $mails;

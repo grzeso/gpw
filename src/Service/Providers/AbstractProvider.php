@@ -8,7 +8,6 @@ use App\Service\ExcelBuilder\ExcelBuilder;
 use App\Service\StocksService;
 use DateTime;
 use PhpOffice\PhpSpreadsheet\Exception;
-use Swift_Attachment;
 
 abstract class AbstractProvider
 {
@@ -61,8 +60,13 @@ abstract class AbstractProvider
         return 'GPW_'.$this->getDate()->format('Y-m-d');
     }
 
-    public function getAttachment(): Swift_Attachment
+    public function getBody(): string
     {
-        return new Swift_Attachment($this->excelBuilder->makeAttachement(), $this->getAttachmentName(), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        return $this->excelBuilder->makeAttachement();
+    }
+
+    public function getType(): string
+    {
+        return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
     }
 }
