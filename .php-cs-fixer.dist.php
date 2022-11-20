@@ -12,6 +12,7 @@ return $config
         '@PSR12' => true,
         '@Symfony' => true,
         'array_syntax' => ['syntax' => 'short'],
+        'global_namespace_import' => true,
     ])
     ->setFinder($finder)
 ;
