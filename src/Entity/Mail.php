@@ -4,29 +4,22 @@ namespace App\Entity;
 
 use App\Repository\MailRepository;
 use DateTimeInterface;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=MailRepository::class)
- */
+#[ORM\Entity(repositoryClass: MailRepository::class)]
 class Mail
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="text")
-     */
-    private $text;
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $text = null;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $TS;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?DateTimeInterface $TS = null;
 
     public function getId(): ?int
     {

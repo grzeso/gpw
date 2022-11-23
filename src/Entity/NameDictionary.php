@@ -3,39 +3,29 @@
 namespace App\Entity;
 
 use App\Repository\NameDictionaryRepository;
+use DateTimeInterface;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=NameDictionaryRepository::class)
- */
+#[ORM\Entity(repositoryClass: NameDictionaryRepository::class)]
 class NameDictionary
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $provider;
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $provider = null;
 
-    /**
-     * @ORM\Column(type="string", length=100)
-     */
-    private $their_name;
+    #[ORM\Column(type: Types::STRING, length: 100)]
+    private ?string $their_name = null;
 
-    /**
-     * @ORM\Column(type="string", length=100)
-     */
-    private $my_name;
+    #[ORM\Column(type: Types::STRING, length: 100)]
+    private ?string $my_name = null;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $ts;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?DateTimeInterface $ts = null;
 
     public function getId(): ?int
     {
@@ -78,12 +68,12 @@ class NameDictionary
         return $this;
     }
 
-    public function getTs(): ?\DateTimeInterface
+    public function getTs(): ?DateTimeInterface
     {
         return $this->ts;
     }
 
-    public function setTs(\DateTimeInterface $ts): self
+    public function setTs(DateTimeInterface $ts): self
     {
         $this->ts = $ts;
 

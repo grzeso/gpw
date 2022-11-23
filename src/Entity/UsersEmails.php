@@ -6,34 +6,25 @@ use App\Repository\UsersEmailsRepository;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=UsersEmailsRepository::class)
- */
+#[ORM\Entity(repositoryClass: UsersEmailsRepository::class)]
 class UsersEmails
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $id = null;
 
-    /**
-     * @ORM\ManyToMany(targetEntity=User::class, inversedBy="usersEmails")
-     */
-    private $user_id;
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'usersEmails')]
+    private Collection $user_id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $email;
+    #[ORM\Column(type: Types::STRING, length: 255)]
+    private ?string $email = null;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $TS;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?DateTimeInterface $TS = null;
 
     public function __construct()
     {

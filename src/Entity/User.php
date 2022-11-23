@@ -5,44 +5,32 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=UserRepository::class)
- */
+#[ORM\Entity(repositoryClass: UserRepository::class)]
 class User
 {
     public const USER_CRON = 4;
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
 
-    /**
-     * @ORM\Column(type="string", length=60)
-     */
-    private $name;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $id = null;
 
-    /**
-     * @ORM\ManyToMany(targetEntity=UsersEmails::class, mappedBy="user_id")
-     */
-    private $usersEmails;
+    #[ORM\Column(type: Types::STRING, length: 60)]
+    private ?string $name = null;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Log::class, mappedBy="user")
-     */
-    private $logs;
+    #[ORM\ManyToMany(targetEntity: UsersEmails::class, mappedBy: 'user_id')]
+    private Collection $usersEmails;
 
-    /**
-     * @ORM\Column(type="json", nullable=true)
-     */
+    #[ORM\OneToMany(targetEntity: Log::class, mappedBy: 'user')]
+    private Collection $logs;
+
+    #[ORM\Column(type: Types::JSON, nullable: true)]
     private $definedFields = [];
 
-    /**
-     * @ORM\Column(type="json", nullable=true)
-     */
+    #[ORM\Column(type: Types::JSON, nullable: true)]
     private $dynamicFields = [];
 
     public function __construct()

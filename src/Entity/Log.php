@@ -4,55 +4,38 @@ namespace App\Entity;
 
 use App\Repository\LogRepository;
 use DateTimeInterface;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=LogRepository::class)
- */
+#[ORM\Entity(repositoryClass: LogRepository::class)]
 class Log
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=500)
-     */
-    private $description;
+    #[ORM\Column(type: Types::STRING, length: 500)]
+    private ?string $description = null;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $params;
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+    private ?string $params = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="logs")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $user;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'logs')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $ts;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?DateTimeInterface $ts = null;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $eventId;
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $eventId = null;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $useId;
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $useId = null;
 
-    /**
-     * @ORM\Column(type="string", length=10)
-     */
-    private $date;
+    #[ORM\Column(type: Types::STRING, length: 10)]
+    private ?string $date = null;
 
     public function getId(): ?int
     {

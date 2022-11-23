@@ -20,9 +20,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class GpwCronController extends AbstractController
 {
-    /**
-     * @Route("/cron/gpw/{id}/{originalDate?}/{allowed?}", name="gpw_cron",methods={"GET"})
-     */
+    #[Route(path: '/cron/gpw/{id}/{originalDate?}/{allowed?}', name: 'gpw_cron', methods: ['GET'])]
     public function execute(
         int $id,
         ?string $originalDate,

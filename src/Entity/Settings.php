@@ -4,34 +4,25 @@ namespace App\Entity;
 
 use App\Repository\SettingsRepository;
 use DateTimeInterface;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=SettingsRepository::class)
- */
+#[ORM\Entity(repositoryClass: SettingsRepository::class)]
 class Settings
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $name;
+    #[ORM\Column(type: Types::STRING, length: 255)]
+    private ?string $name = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $value;
+    #[ORM\Column(type: Types::STRING, length: 255)]
+    private ?string $value = null;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private $ts;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?DateTimeInterface $ts = null;
 
     public function getId(): ?int
     {

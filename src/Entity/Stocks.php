@@ -3,45 +3,32 @@
 namespace App\Entity;
 
 use App\Repository\StocksRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=StocksRepository::class)
- */
+#[ORM\Entity(repositoryClass: StocksRepository::class)]
 class Stocks
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $id = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=User::class)
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $user_id;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user_id = null;
 
-    /**
-     * @ORM\Column(type="string", length=40)
-     */
-    private $name;
+    #[ORM\Column(type: Types::STRING, length: 40)]
+    private ?string $name = null;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $quantity;
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $quantity = null;
 
-    /**
-     * @ORM\Column(type="float")
-     */
-    private $start_price;
+    #[ORM\Column(type: Types::FLOAT)]
+    private ?float $start_price = null;
 
-    /**
-     * @ORM\Column(type="string", length=10)
-     */
-    private $position;
+    #[ORM\Column(type: Types::STRING, length: 10)]
+    private ?string $position = null;
 
     public function getId(): ?int
     {
