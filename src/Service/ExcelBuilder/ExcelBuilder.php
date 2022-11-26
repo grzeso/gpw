@@ -4,7 +4,7 @@ namespace App\Service\ExcelBuilder;
 
 use App\Dto\StockDto;
 use App\Entity\User\User;
-use App\Repository\NameDictionaryRepository;
+use App\Repository\Provider\ShortNameRepository;
 use App\Service\Dto\DynamicDataDto;
 use DateTime;
 use PhpOffice\PhpSpreadsheet\Exception;
@@ -20,9 +20,9 @@ abstract class ExcelBuilder
     protected DateTime $date;
     private string $devInfo;
     private DynamicDataDto $dynamicData;
-    protected NameDictionaryRepository $nameDictionaryRepository;
+    protected ShortNameRepository $nameDictionaryRepository;
 
-    public function __construct(string $devInfo, NameDictionaryRepository $nameDictionaryRepository)
+    public function __construct(string $devInfo, ShortNameRepository $nameDictionaryRepository)
     {
         $this->devInfo = $devInfo;
         $this->nameDictionaryRepository = $nameDictionaryRepository;

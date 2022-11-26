@@ -2,7 +2,7 @@
 
 namespace App\Entity\User;
 
-use App\Repository\UsersEmailsRepository;
+use App\Repository\User\UsersEmailsRepository;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;

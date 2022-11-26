@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\User;
 
 use App\Entity\User\UserStock;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -12,7 +12,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method UserStock[]    findAll()
  * @method UserStock[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class StocksRepository extends ServiceEntityRepository
+class UserStockRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

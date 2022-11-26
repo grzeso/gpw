@@ -2,7 +2,7 @@
 
 namespace App\Entity\User;
 
-use App\Repository\MailRepository;
+use App\Repository\User\MailRepository;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;

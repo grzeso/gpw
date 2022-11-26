@@ -3,7 +3,7 @@
 namespace App\Entity\User;
 
 use App\Entity\Log;
-use App\Repository\UserRepository;
+use App\Repository\User\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\Provider;
 
 use App\Entity\Provider\ShortName;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -12,7 +12,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method ShortName[]    findAll()
  * @method ShortName[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class NameDictionaryRepository extends ServiceEntityRepository
+class ShortNameRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

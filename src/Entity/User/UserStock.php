@@ -3,11 +3,11 @@
 namespace App\Entity\User;
 
 use App\Entity\Stock\Stock;
-use App\Repository\StocksRepository;
+use App\Repository\User\UserStockRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: StocksRepository::class)]
+#[ORM\Entity(repositoryClass: UserStockRepository::class)]
 class UserStock
 {
     #[ORM\Id]
