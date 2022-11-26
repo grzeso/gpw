@@ -2,52 +2,66 @@
 
 namespace App\Dto;
 
+use App\Entity\Stock\Stock;
+use DateTime;
+
 class StockDto
 {
-    private string $name;
-    private float $value;
-    private string $change;
+    private Stock $stock;
+    private float $rate;
+    private float $change;
     private string $position;
     private int $quantity;
+    private DateTime $rateDate;
+
+    public function getRateDate(): DateTime
+    {
+        return $this->rateDate;
+    }
+
+    public function setRateDate(DateTime $rateDate): void
+    {
+        $this->rateDate = $rateDate;
+    }
 
     public function getPosition(): string
     {
         return $this->position;
     }
 
-    public function setPosition($position): void
+    public function setPosition(?string $position): void
     {
         $this->position = $position;
     }
 
-    public function getChange(): string
+    public function getChange(): float
     {
         return $this->change;
     }
 
-    public function setChange($change)
+    public function setChange(float $change): void
     {
         $this->change = $change;
     }
 
-    public function getName(): string
+    public function getStock(): Stock
     {
-        return $this->name;
+        return $this->stock;
     }
 
-    public function setName(string $name)
+    public function setStock(Stock $stock): void
     {
-        $this->name = $name;
+        $this->stock = $stock;
     }
 
-    public function getValue(): float
+    public function getRate(): float
     {
-        return $this->value;
+        return $this->rate;
     }
 
-    public function setValue(float $value)
+    public function setRate(float $rate): void
     {
-        $this->value = $value;
+        $this->rate = $rate;
     }
 
     public function getQuantity(): int

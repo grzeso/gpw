@@ -32,12 +32,13 @@ class ExcelBuilderByGpw extends ExcelBuilder
             foreach ($userStocks as $userStock) {
                 if ($userStock->getStock()->getName() == $name->getValue()) {
                     $stock = new StockDto();
-                    $stock->setName($name->getValue());
-                    $stock->setValue($activeSheet->getCell('H'.$row)->getValue());
+                    $stock->setStock($userStock->getStock());
+                    $stock->setRate($activeSheet->getCell('H'.$row)->getValue());
                     $stock->setChange($activeSheet->getCell('I'.$row)->getValue());
                     $stock->setPosition($userStock->getPosition());
+                    $stock->setRateDate($this->getDate());
                     $stock->setQuantity($userStock->getQuantity());
-                    array_push($userStocksOutput, $stock);
+                    $userStocksOutput[] = $stock;
                 }
             }
         }

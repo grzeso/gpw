@@ -38,10 +38,11 @@ class ExcelBuilderByMoney extends ExcelBuilder
             }
 
             $stock = new StockDto();
-            $stock->setName($userStock->getStock()->getName());
-            $stock->setValue($moneyStock->kurs);
+            $stock->setStock($userStock->getStock());
+            $stock->setRate($moneyStock->kurs);
             $stock->setChange(round($moneyStock->changePrev, 2));
             $stock->setPosition($userStock->getPosition());
+            $stock->setRateDate($this->getDate());
             $stock->setQuantity($userStock->getQuantity());
             $userStocksOutput[] = $stock;
         }

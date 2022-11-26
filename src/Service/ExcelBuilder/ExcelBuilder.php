@@ -4,12 +4,14 @@ namespace App\Service\ExcelBuilder;
 
 use App\Dto\StockDto;
 use App\Entity\User\User;
+use App\Event\StockDto\StockDtoEvent;
 use App\Repository\Provider\ShortNameRepository;
 use App\Service\Dto\DynamicDataDto;
 use DateTime;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 abstract class ExcelBuilder
 {
@@ -22,7 +24,7 @@ abstract class ExcelBuilder
     private DynamicDataDto $dynamicData;
     protected ShortNameRepository $nameDictionaryRepository;
 
-    public function __construct(string $devInfo, ShortNameRepository $nameDictionaryRepository)
+    public function __construct(string $devInfo, ShortNameRepository $nameDictionaryRepository, private EventDispatcherInterface $eventDispatcher)
     {
         $this->devInfo = $devInfo;
         $this->nameDictionaryRepository = $nameDictionaryRepository;
@@ -74,13 +76,15 @@ abstract class ExcelBuilder
 
         /** @var StockDto $userStock */
         foreach ($this->findUserStocks() as $userStock) {
-            $sum += $userStock->getQuantity() * $userStock->getValue();
+            $sum += $userStock->getQuantity() * $userStock->getRate();
             $worksheet
-                ->setCellValue($userStock->getPosition().'1', $userStock->getName())
-                ->setCellValue($userStock->getPosition().'2', $userStock->getValue())
+                ->setCellValue($userStock->getPosition().'1', $userStock->getStock()->getName())
+                ->setCellValue($userStock->getPosition().'2', $userStock->getRate())
                 ->setCellValue($userStock->getPosition().'3', $userStock->getChange())
                 ->setCellValue($userStock->getPosition().'4', $userStock->getQuantity())
-                ->setCellValue($userStock->getPosition().'5', $userStock->getQuantity() * $userStock->getValue());
+                ->setCellValue($userStock->getPosition().'5', $userStock->getQuantity() * $userStock->getRate());
+
+            $this->eventDispatcher->dispatch(new StockDtoEvent($userStock), StockDtoEvent::SAVE_RATE);
         }
 
         $worksheet->setCellValue('H8', 'WARTOSC:')->setCellValue('I8', $sum);

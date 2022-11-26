@@ -31,10 +31,14 @@ class Stock
     #[ORM\OneToMany(mappedBy: 'stock', targetEntity: UserStock::class)]
     private Collection $stocks;
 
+    #[ORM\OneToMany(mappedBy: 'stock', targetEntity: Rate::class)]
+    private Collection $rates;
+
     public function __construct()
     {
         $this->shortNames = new ArrayCollection();
         $this->stocks = new ArrayCollection();
+        $this->rates = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -120,6 +124,36 @@ class Stock
             // set the owning side to null (unless already changed)
             if ($stock->getStock() === $this) {
                 $stock->setStock(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Rate>
+     */
+    public function getRates(): Collection
+    {
+        return $this->rates;
+    }
+
+    public function addRate(Rate $rate): self
+    {
+        if (!$this->rates->contains($rate)) {
+            $this->rates->add($rate);
+            $rate->setStock($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRate(Rate $rate): self
+    {
+        if ($this->rates->removeElement($rate)) {
+            // set the owning side to null (unless already changed)
+            if ($rate->getStock() === $this) {
+                $rate->setStock(null);
             }
         }
 
