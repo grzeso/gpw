@@ -3,10 +3,9 @@
 namespace App\Service\ExcelBuilder;
 
 use App\Dto\StockDto;
-use App\Entity\User;
+use App\Entity\User\User;
 use App\Repository\NameDictionaryRepository;
 use App\Service\Dto\DynamicDataDto;
-use App\Service\StocksService;
 use DateTime;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -15,30 +14,24 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 abstract class ExcelBuilder
 {
     private Spreadsheet $excelOutput;
-    protected StocksService $stocks;
     protected Spreadsheet $excelInput;
     private string $dataSource;
     protected User $user;
     protected DateTime $date;
     private string $devInfo;
     private DynamicDataDto $dynamicData;
-    protected NameDictionaryRepository $dictionaryRepository;
+    protected NameDictionaryRepository $nameDictionaryRepository;
 
-    public function __construct(string $devInfo, NameDictionaryRepository $dictionaryRepository)
+    public function __construct(string $devInfo, NameDictionaryRepository $nameDictionaryRepository)
     {
         $this->devInfo = $devInfo;
-        $this->dictionaryRepository = $dictionaryRepository;
+        $this->nameDictionaryRepository = $nameDictionaryRepository;
     }
 
     /**
      * @return array<int, StockDto>
      */
     abstract protected function findUserStocks(): array;
-
-    public function setStocks(StocksService $stocks): void
-    {
-        $this->stocks = $stocks;
-    }
 
     public function setDataSource(string $dataSource): void
     {
@@ -70,7 +63,7 @@ abstract class ExcelBuilder
      */
     public function build(): void
     {
-        //mój excel
+        // mój excel
         $this->excelOutput = new Spreadsheet();
         $this->excelOutput->setActiveSheetIndex(0);
 

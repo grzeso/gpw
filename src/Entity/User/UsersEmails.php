@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\User;
 
 use App\Repository\UsersEmailsRepository;
 use DateTimeInterface;

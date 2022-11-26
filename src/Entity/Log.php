@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\User\User;
 use App\Repository\LogRepository;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;

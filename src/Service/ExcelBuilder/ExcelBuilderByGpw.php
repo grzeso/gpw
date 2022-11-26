@@ -3,15 +3,16 @@
 namespace App\Service\ExcelBuilder;
 
 use App\Dto\StockDto;
-use App\Entity\Stocks;
+use App\Entity\User\UserStock;
+use PhpOffice\PhpSpreadsheet\Reader\Exception;
 use PhpOffice\PhpSpreadsheet\Reader\Xls;
 
 class ExcelBuilderByGpw extends ExcelBuilder
 {
     /**
-     * @refactor - moze refactor
-     *
      * @return array<int, StockDto>
+     *
+     * @throws Exception
      */
     protected function findUserStocks(): array
     {
@@ -19,9 +20,7 @@ class ExcelBuilderByGpw extends ExcelBuilder
         $this->excelInput = (new Xls())->load($this->getDataSource());
 
         $activeSheet = $this->excelInput->getActiveSheet();
-        $this->stocks->setUser($this->user);
-        $userStocksName = $this->stocks->getUserStocksName();
-        $userStocks = $this->stocks->getUserStocks();
+        $userStocks = $this->user->getUserStocks();
 
         $userStocksOutput = [];
         $highestRow = $activeSheet->getHighestRow();
@@ -29,9 +28,9 @@ class ExcelBuilderByGpw extends ExcelBuilder
         for ($row = 1; $row <= $highestRow; ++$row) {
             $name = $activeSheet->getCell('B'.$row);
 
-            /* @var Stocks $userStock */
+            /* @var UserStock $userStock */
             foreach ($userStocks as $userStock) {
-                if (in_array($name->getValue(), $userStocksName) && $userStock->getName() == $name->getValue()) {
+                if ($userStock->getStock()->getName() == $name->getValue()) {
                     $stock = new StockDto();
                     $stock->setName($name->getValue());
                     $stock->setValue($activeSheet->getCell('H'.$row)->getValue());

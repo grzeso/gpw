@@ -2,13 +2,13 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
+use App\Entity\User\User;
+use App\Entity\User\UsersEmails;
 use App\Service\Access\AccessService;
 use App\Service\Dto\DynamicDataDto;
 use App\Service\Logger\Logger;
 use App\Service\Providers\ProviderFactory;
 use App\Service\Settings\SettingsService;
-use App\Service\UserEmailsService;
 use DateTime;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -30,7 +30,6 @@ class GpwCronController extends AbstractController
         Logger $logger,
         ProviderFactory $providerFactory,
         DynamicDataDto $dynamicDataDto,
-        UserEmailsService $userEmailsService,
         AccessService $accessService,
         SettingsService $settingsService
     ): Response {
@@ -67,7 +66,7 @@ class GpwCronController extends AbstractController
 
         $message
             ->from($this->getParameter('gpw.email'))
-            ->to(...$userEmailsService->convert($user))
+            ->to(...$user->getUsersEmails()->map(fn (UsersEmails $emails) => $emails->getEmail())->toArray())
             ->subject($name)
             ->html($name);
 

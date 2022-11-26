@@ -1,25 +1,19 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\User;
 
+use App\Entity\Stock\Stock;
 use App\Repository\StocksRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: StocksRepository::class)]
-class Stocks
+class UserStock
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
     private ?int $id = null;
-
-    #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $user_id = null;
-
-    #[ORM\Column(type: Types::STRING, length: 40)]
-    private ?string $name = null;
 
     #[ORM\Column(type: Types::INTEGER)]
     private ?int $quantity = null;
@@ -30,31 +24,25 @@ class Stocks
     #[ORM\Column(type: Types::STRING, length: 10)]
     private ?string $position = null;
 
+    #[ORM\ManyToOne(inversedBy: 'stocks')]
+    private ?Stock $stock = null;
+
+    #[ORM\ManyToOne(inversedBy: 'userStocks')]
+    private ?User $user = null;
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getUserId(): ?User
+    public function getUser(): ?User
     {
-        return $this->user_id;
+        return $this->user;
     }
 
-    public function setUserId(?User $user_id): self
+    public function setUser(?User $user): self
     {
-        $this->user_id = $user_id;
-
-        return $this;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
+        $this->user = $user;
 
         return $this;
     }
@@ -91,6 +79,18 @@ class Stocks
     public function setPosition(string $position): self
     {
         $this->position = $position;
+
+        return $this;
+    }
+
+    public function getStock(): ?Stock
+    {
+        return $this->stock;
+    }
+
+    public function setStock(?Stock $stock): self
+    {
+        $this->stock = $stock;
 
         return $this;
     }

@@ -4,7 +4,7 @@ namespace App\Service\Logger;
 
 use App\Entity\Log;
 use App\Entity\Settings;
-use App\Entity\User;
+use App\Entity\User\User;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;

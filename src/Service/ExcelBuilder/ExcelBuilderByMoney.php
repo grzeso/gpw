@@ -3,70 +3,47 @@
 namespace App\Service\ExcelBuilder;
 
 use App\Dto\StockDto;
-use App\Entity\NameDictionary;
-use App\Entity\Stocks;
-use stdClass;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
-use Symfony\Contracts\Cache\ItemInterface;
+use App\Entity\Provider\ShortName;
+use App\Entity\User\UserStock;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 
 class ExcelBuilderByMoney extends ExcelBuilder
 {
-    private function translate(stdClass $moneyStock): ?string
-    {
-        $cache = new FilesystemAdapter();
-
-        $values = $cache->get('dictionary.money', function (ItemInterface $item) {
-            $item->expiresAfter(10);
-
-            return $this->dictionaryRepository->findBy(['provider' => 1]);
-        });
-
-        /** @var NameDictionary $value */
-        foreach ($values as $value) {
-            if ($moneyStock->symbol === $value->getTheirName() || $moneyStock->nazwaPelna === $value->getTheirName()) {
-                return $value->getMyName();
-            }
-        }
-
-        return null;
-    }
-
     /**
      * @return array<int, StockDto>
      */
     protected function findUserStocks(): array
     {
+        $userStocks = $this->user->getUserStocks();
         $dataSource = json_decode($this->getDataSource())->data->data;
+        $collection = new ArrayCollection($dataSource);
 
-        $this->stocks->setUser($this->user);
-        $userStocksName = $this->stocks->getUserStocksName();
-        $userStocks = $this->stocks->getUserStocks();
         $userStocksOutput = [];
+        /** @var UserStock $userStock */
+        foreach ($userStocks as $userStock) {
+            $moneyStock = null;
 
-        /** @var stdClass $item */
-        foreach ($dataSource as $item) {
-            if (!$item->symbol && !$item->nazwaPelna) {
+            $names = $userStock->getStock()->getShortNames();
+            /** @var ShortName $name */
+            foreach ($names as $name) {
+                $criteria = Criteria::create()
+                    ->andWhere(Criteria::expr()->eq('symbol', $name->getNameInProvider()))
+                    ->orWhere(Criteria::expr()->eq('nazwaPelna', $name->getNameInProvider()));
+                $moneyStock = $collection->matching($criteria)->first();
+            }
+
+            if (!$moneyStock) {
                 continue;
             }
 
-            $name = $this->translate($item);
-
-            if (!$name) {
-                continue;
-            }
-
-            /* @var Stocks $userStock */
-            foreach ($userStocks as $userStock) {
-                if (in_array($name, $userStocksName) && $userStock->getName() == $name) {
-                    $stock = new StockDto();
-                    $stock->setName($name);
-                    $stock->setValue($item->kurs);
-                    $stock->setChange(round($item->changePrev, 2));
-                    $stock->setPosition($userStock->getPosition());
-                    $stock->setQuantity($userStock->getQuantity());
-                    array_push($userStocksOutput, $stock);
-                }
-            }
+            $stock = new StockDto();
+            $stock->setName($userStock->getStock()->getName());
+            $stock->setValue($moneyStock->kurs);
+            $stock->setChange(round($moneyStock->changePrev, 2));
+            $stock->setPosition($userStock->getPosition());
+            $stock->setQuantity($userStock->getQuantity());
+            $userStocksOutput[] = $stock;
         }
 
         return $userStocksOutput;

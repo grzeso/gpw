@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Provider;
 
+use App\Entity\Stock\Stock;
 use App\Repository\NameDictionaryRepository;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: NameDictionaryRepository::class)]
-class NameDictionary
+class ShortName
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -19,13 +20,13 @@ class NameDictionary
     private ?int $provider = null;
 
     #[ORM\Column(type: Types::STRING, length: 100)]
-    private ?string $their_name = null;
+    private ?string $nameInProvider = null;
 
-    #[ORM\Column(type: Types::STRING, length: 100)]
-    private ?string $my_name = null;
+    #[ORM\ManyToOne(inversedBy: 'shortNames')]
+    private ?Stock $stock = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?DateTimeInterface $ts = null;
+    private ?DateTimeInterface $createdAt = null;
 
     public function getId(): ?int
     {
@@ -44,38 +45,38 @@ class NameDictionary
         return $this;
     }
 
-    public function getTheirName(): ?string
+    public function getNameInProvider(): ?string
     {
-        return $this->their_name;
+        return $this->nameInProvider;
     }
 
-    public function setTheirName(string $their_name): self
+    public function setNameInProvider(string $nameInProvider): self
     {
-        $this->their_name = $their_name;
+        $this->nameInProvider = $nameInProvider;
 
         return $this;
     }
 
-    public function getMyName(): ?string
+    public function getStock(): ?Stock
     {
-        return $this->my_name;
+        return $this->stock;
     }
 
-    public function setMyName(string $my_name): self
+    public function setStock(?Stock $stock): self
     {
-        $this->my_name = $my_name;
+        $this->stock = $stock;
 
         return $this;
     }
 
-    public function getTs(): ?DateTimeInterface
+    public function getCreatedAt(): ?DateTimeInterface
     {
-        return $this->ts;
+        return $this->createdAt;
     }
 
-    public function setTs(DateTimeInterface $ts): self
+    public function setCreatedAt(DateTimeInterface $createdAt): self
     {
-        $this->ts = $ts;
+        $this->createdAt = $createdAt;
 
         return $this;
     }

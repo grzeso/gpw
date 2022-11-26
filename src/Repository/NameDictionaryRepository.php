@@ -2,21 +2,21 @@
 
 namespace App\Repository;
 
-use App\Entity\NameDictionary;
+use App\Entity\Provider\ShortName;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method NameDictionary|null find($id, $lockMode = null, $lockVersion = null)
- * @method NameDictionary|null findOneBy(array $criteria, array $orderBy = null)
- * @method NameDictionary[]    findAll()
- * @method NameDictionary[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method ShortName|null find($id, $lockMode = null, $lockVersion = null)
+ * @method ShortName|null findOneBy(array $criteria, array $orderBy = null)
+ * @method ShortName[]    findAll()
+ * @method ShortName[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class NameDictionaryRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, NameDictionary::class);
+        parent::__construct($registry, ShortName::class);
     }
 
     // /**

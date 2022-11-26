@@ -2,10 +2,9 @@
 
 namespace App\Service\Providers;
 
-use App\Entity\User;
+use App\Entity\User\User;
 use App\Service\Dto\DynamicDataDto;
 use App\Service\ExcelBuilder\ExcelBuilder;
-use App\Service\StocksService;
 use DateTime;
 use PhpOffice\PhpSpreadsheet\Exception;
 
@@ -15,7 +14,6 @@ abstract class AbstractProvider
     protected User $user;
     protected DateTime $date;
     protected ExcelBuilder $excelBuilder;
-    protected StocksService $stocks;
     private DynamicDataDto $dynamicData;
 
     /**
@@ -25,7 +23,6 @@ abstract class AbstractProvider
     {
         $this->excelBuilder->setUser($this->user);
         $this->excelBuilder->setDate($this->getDate());
-        $this->excelBuilder->setStocks($this->stocks);
         $this->excelBuilder->setDynamicData($this->dynamicData);
         $this->excelBuilder->build();
     }

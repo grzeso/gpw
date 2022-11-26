@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\User;
 
+use App\Entity\Log;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -33,10 +34,14 @@ class User
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private $dynamicFields = [];
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserStock::class)]
+    private Collection $userStocks;
+
     public function __construct()
     {
         $this->usersEmails = new ArrayCollection();
         $this->logs = new ArrayCollection();
+        $this->userStocks = new ArrayCollection();
     }
 
     public function getId(): int
@@ -133,6 +138,36 @@ class User
     public function setDynamicFields(?array $dynamicFields): self
     {
         $this->dynamicFields = $dynamicFields;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserStock>
+     */
+    public function getUserStocks(): Collection
+    {
+        return $this->userStocks;
+    }
+
+    public function addUserStock(UserStock $userStock): self
+    {
+        if (!$this->userStocks->contains($userStock)) {
+            $this->userStocks->add($userStock);
+            $userStock->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserStock(UserStock $userStock): self
+    {
+        if ($this->userStocks->removeElement($userStock)) {
+            // set the owning side to null (unless already changed)
+            if ($userStock->getUser() === $this) {
+                $userStock->setUser(null);
+            }
+        }
 
         return $this;
     }

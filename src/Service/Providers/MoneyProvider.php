@@ -5,22 +5,19 @@ namespace App\Service\Providers;
 use App\Service\DataSource\ApiMoney;
 use App\Service\ExcelBuilder\ExcelBuilder;
 use App\Service\ExcelBuilder\ExcelBuilderByMoney;
-use App\Service\StocksService;
 
 class MoneyProvider extends AbstractProvider
 {
-    const PROVIDER_NAME = 'MONEY';
+    public const PROVIDER_NAME = 'MONEY';
+    public const PROVIDER_ID = 1;
     private ApiMoney $apiMoney;
-    protected StocksService $stocks;
     protected ExcelBuilder $excelBuilder;
 
     public function __construct(
         ApiMoney $apiMoney,
-        StocksService $stocks,
         ExcelBuilderByMoney $excelBuilder
     ) {
         $this->apiMoney = $apiMoney;
-        $this->stocks = $stocks;
         $this->excelBuilder = $excelBuilder;
     }
 
