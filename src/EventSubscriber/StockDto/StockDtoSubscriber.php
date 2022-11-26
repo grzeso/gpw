@@ -38,6 +38,7 @@ class StockDtoSubscriber implements EventSubscriberInterface
             ->setStock($stockDto->getStock())
             ->setRate($stockDto->getRate())
             ->setRateDate($stockDto->getRateDate())
+            ->setPercent($stockDto->getChange())
             ->setCreatedAt(new DateTime());
 
         $this->rateRepository->save($rate, true);

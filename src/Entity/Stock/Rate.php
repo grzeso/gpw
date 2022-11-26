@@ -3,6 +3,7 @@
 namespace App\Entity\Stock;
 
 use App\Repository\Stock\RateRepository;
+use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -22,10 +23,13 @@ class Rate
     private ?float $rate = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $createdAt = null;
+    private ?DateTimeInterface $createdAt = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $rateDate = null;
+    private ?DateTimeInterface $rateDate = null;
+
+    #[ORM\Column]
+    private ?float $percent = null;
 
     public function getId(): ?int
     {
@@ -56,26 +60,38 @@ class Rate
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt(): ?DateTimeInterface
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt(DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getRateDate(): ?\DateTimeInterface
+    public function getRateDate(): ?DateTimeInterface
     {
         return $this->rateDate;
     }
 
-    public function setRateDate(\DateTimeInterface $rateDate): self
+    public function setRateDate(DateTimeInterface $rateDate): self
     {
         $this->rateDate = $rateDate;
+
+        return $this;
+    }
+
+    public function getPercent(): ?float
+    {
+        return $this->percent;
+    }
+
+    public function setPercent(float $percent): self
+    {
+        $this->percent = $percent;
 
         return $this;
     }
