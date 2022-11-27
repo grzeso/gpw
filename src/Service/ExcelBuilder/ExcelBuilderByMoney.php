@@ -31,6 +31,10 @@ class ExcelBuilderByMoney extends ExcelBuilder
                     ->andWhere(Criteria::expr()->eq('symbol', $name->getNameInProvider()))
                     ->orWhere(Criteria::expr()->eq('nazwaPelna', $name->getNameInProvider()));
                 $moneyStock = $collection->matching($criteria)->first();
+
+                if ($moneyStock) {
+                    break;
+                }
             }
 
             if (!$moneyStock) {
