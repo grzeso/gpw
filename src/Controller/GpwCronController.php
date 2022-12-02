@@ -33,7 +33,7 @@ class GpwCronController extends AbstractController
         AccessService $accessService,
         SettingsService $settingsService
     ): Response {
-        if (!$date = DateTime::createFromFormat('d-m-Y', $originalDate)) {
+        if (!$originalDate || !$date = DateTime::createFromFormat('d-m-Y', $originalDate)) {
             $date = new DateTime();
         }
         $settingsService->updateLogNumber();
