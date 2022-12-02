@@ -44,7 +44,7 @@ class ExcelBuilderByMoney extends ExcelBuilder
             $stock = new StockDto();
             $stock->setStock($userStock->getStock());
             $stock->setRate($moneyStock->kurs);
-            $stock->setChange(round($moneyStock->changePrev, 2));
+            $stock->setChange(round($moneyStock->changePrev ?? 0, 2));
             $stock->setPosition($userStock->getPosition());
             $stock->setRateDate($this->getDate());
             $stock->setQuantity($userStock->getQuantity());
